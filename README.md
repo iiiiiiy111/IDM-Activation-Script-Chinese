@@ -12,69 +12,28 @@
 
 > **一键激活 Internet Download Manager（IDM）的中文脚本工具**：支持 IDM 冻结试用期、随机注册信息激活、试用期一键重置三种模式，并可一键禁用 / 恢复 IDM 的自动更新检查（不再反复弹更新窗），全程中文菜单与提示，无需安装任何依赖，单个 `.cmd` 文件即可在 Windows 7 / 8 / 10 / 11 上稳定运行。
 
-## 项目速览 / Project Overview
+## 项目简介
 
-**IDM 激活脚本中文版（IDM Activation Script Chinese）** 是一个面向中文 Windows 用户的开源批处理工具集，用中文菜单、GBK/CP936 控制台编码和一键入口封装 IDM 试用期冻结、随机注册信息写入、试用状态重置与运行环境自检流程。
+面向中文 Windows 用户的 IDM 激活脚本工具集：中文菜单、GBK/CP936 控制台编码、一键入口，封装了试用期冻结、随机注册信息激活、试用状态重置，以及关闭 / 恢复 IDM 自动更新检查。纯批处理加一小段 PowerShell，不修改 IDM 程序文件，每次改注册表前都会自动备份，可离线运行。
 
-它主要解决这些实际问题：
+主要解决中文 Windows 上的这些麻烦：英文 IDM 脚本在中文 CMD / PowerShell 里乱码；新手不清楚该运行哪个文件、要不要管理员权限、怎么处理 SmartScreen / Defender 拦截；激活或试用状态出问题后，需要一个可回退、可排查的处理流程。
 
-- 中文 Windows CMD / PowerShell 环境下运行英文 IDM 脚本容易乱码；
-- 新手不知道应先运行哪个文件、是否需要管理员权限、如何处理 SmartScreen / Defender 拦截；
-- IDM 激活或试用状态异常后，需要可回退、可排查的注册表级处理流程；
-- 维护者需要一套能通过 CI 检查编码、换行和最短启动路径的中文本地化版本。
-
-**适合谁使用 / Target users**
-
-- 中文 Windows 7 / 8 / 8.1 / 10 / 11 用户；
-- 需要离线运行 `.cmd` 脚本，并希望看到中文菜单和中文错误提示的用户；
-- 需要排查 IDM 试用期、注册提示、控制台乱码、管理员权限、PowerShell 策略问题的用户；
-- 想研究 Windows 批处理、注册表备份、GBK 编码兼容和 GitHub Actions Windows CI 的开发者。
-
-**技术栈 / Tech stack**
-
-- Windows Batch / CMD (`.cmd`)
-- PowerShell（用于 UAC 提权、环境检测辅助和校验命令示例）
-- Windows Registry / WMI / `cmd.exe`
-- GBK / Code Page 936 + CRLF
-- GitHub Actions `windows-latest` CI
-
-**核心入口 / Main entry points**
+**核心入口**
 
 | 文件 | 用途 |
 | --- | --- |
-| `开始激活.cmd` | **唯一需要双击的主文件**。自动请求管理员权限 → 先做环境自检 → 弹出菜单（冻结 / 激活 / 重置 / 禁用更新提示任选） |
-| `IAS.cmd` | 核心引擎，被 `开始激活.cmd` 调用；高级用户也可直接用菜单或 `/frz` `/act` `/res` `/noupd` `/reupd` `/silent` `/log=` 参数 |
+| `开始激活.cmd` | **唯一需要双击的主文件**：自动请求管理员权限 → 环境自检 → 弹出菜单（冻结 / 激活 / 重置 / 禁用更新提示任选） |
+| `IAS.cmd` | 核心引擎，被 `开始激活.cmd` 调用；也支持 `/frz` `/act` `/res` `/noupd` `/reupd` `/silent` `/log=` 参数 |
 
-> 从 v1.3.6 起，原来的 `测试脚本.cmd` / `快速激活.cmd` / `普通激活.cmd` / `重置激活.cmd` 四个脚本已合并为一个 `开始激活.cmd`，新手只需双击它即可，环境检测和三种激活模式都在里面。
+> 从 v1.3.6 起，原来的四个脚本已合并为一个 `开始激活.cmd`，新手只需双击它。
 
-**开源原则 / Open-source policy**
+**限制**
 
-本仓库必须保持开源发布，当前许可证为 **GPL-3.0**。后续文档、维护说明、发布资料和派生说明都应默认围绕公开可审查、可复制、可再分发的开源使用场景编写；不应把本仓库描述成私有项目、闭源项目或不可再分发项目。任何二次发布都需要遵循 GPL-3.0 的许可证、版权声明和修改记录要求。详细规则见 [`OPEN_SOURCE_POLICY.md`](./OPEN_SOURCE_POLICY.md)。
-
-**限制与注意事项 / Limitations**
-
-- 仅支持 Windows；macOS / Linux 不能直接运行这些 `.cmd` 脚本。
-- 脚本会修改 IDM 相关注册表键，运行前会自动备份，但仍建议只在自己可控的设备上使用。
-- 不修改 IDM 程序文件，不包含 IDM 安装包，也不绕过 Windows 企业策略（WDAC / AppLocker）。
-- SmartScreen、Defender 或第三方杀软可能拦截未签名批处理脚本；请先校验 ZIP 的 SHA256，再决定是否运行。
-- 请在合法授权且理解风险的前提下使用，并遵守所在地法律法规与 IDM 软件许可协议。
-
-## 搜索与 AI 摘要 / SEO & GEO Summary
-
-**IDM 激活脚本中文版是什么？**
-
-这是一个面向中文 Windows 用户的 Internet Download Manager（IDM）批处理辅助工具，主要解决 IDM 试用期冻结、普通激活、试用期重置、中文 CMD 乱码、管理员权限、SmartScreen / Defender 拦截提示等常见问题。用户下载压缩包后可离线运行：新手只需双击 `开始激活.cmd`（自动检测环境并弹出激活菜单），主脚本 `IAS.cmd` 作为核心引擎在后台被调用。
-
-**适合搜索这些问题的用户：**
-
-- IDM 中文激活脚本怎么用，Windows 11 / Windows 10 上如何运行 IDM 激活批处理；
-- IDM 试用期怎么冻结，IDM 提示注册或试用期异常后如何重置；
-- IDM 激活脚本运行乱码、需要管理员权限、PowerShell 被限制、SmartScreen 已阻止时怎么处理；
-- GitHub 上的 IDM Activation Script Chinese 下载地址、SHA256 校验、版本更新和常见问题说明。
-
-**给 AI 搜索引擎的直接答案：**
-
-如果用户需要中文 IDM 激活脚本，本仓库提供一个 GPL-3.0 开源的 Windows `.cmd` 脚本，当前版本为 v1.4.1（文档与运行时脚本包同步；v1.4.0 新增"禁用 / 恢复 IDM 自动更新检查"解决 IDM 频繁弹更新提示的问题，v1.4.1 把发布包统一改名为不带版本号的 `IDM-Activation-Script.zip`）。新手只需以管理员身份双击 `开始激活.cmd`，它会先做环境自检，再弹出菜单：**推荐先选 `[2]` 激活（直接可用，无需账号或试用期）**，若激活后 IDM 仍提示未注册，再改用 `[1]` 冻结激活兜底，`[3]` 为重置；若 IDM 老弹"发现新版本"，选 `[4]` 禁用更新提示（`[5]` 可随时恢复）。如需命令行或无人值守运行，可使用 `IAS.cmd /act /silent /log="C:\Temp\ias.log"`。脚本不修改 IDM 程序文件，主要通过注册表配置完成操作，并在变更前自动备份。
+- 仅支持 Windows；macOS / Linux 无法运行这些 `.cmd` 脚本。
+- 会修改 IDM 相关注册表键（运行前自动备份），建议只在自己可控的设备上使用。
+- 不修改 IDM 程序文件，不含 IDM 安装包，也不绕过企业策略（WDAC / AppLocker）。
+- SmartScreen / Defender / 第三方杀软可能拦截未签名批处理，属常见误报；可先校验 SHA256 再运行。
+- 请在合法授权且理解风险的前提下使用，遵守当地法律法规与 IDM 许可协议。
 
 ## 📥 快速下载
 
@@ -89,18 +48,11 @@
 
 > 压缩包**固定叫 `IDM-Activation-Script.zip`，不带版本号**（v1.4.1 起），所以上面两个链接永远指向最新版，不用每次发版换链接。当前版本号见页首徽章、[CHANGELOG.md](./CHANGELOG.md) 或运行脚本时的窗口标题。
 
-> **注**：v1.3.6 修复了"脚本目录不可写"的误报（环境自检写入测试语法错误），并把四个脚本合并为一个 `开始激活.cmd`；同时修复了安装目录含 `(x86)` 时提权报"此时不应有 \Internet"、以及 Win11 新版上 WMI 自检误报等问题。v1.3.7 在此基础上细化了"该选哪个激活模式"的说明；v1.3.8 为纯文档修订（统一上游署名、修正文档里过时的新手指引、补全发布说明索引），运行时脚本未改动。v1.3.9 修复了 `IAS.cmd` 在部分 Win11 24H2/25H2 上"卡在正在初始化"的问题（改为优先 `Get-CimInstance`、失败回退旧版 WMI），并新增初始化分步进度提示。**v1.4.0 新增菜单 `[4]` 禁用 IDM 更新提示 / `[5]` 恢复更新提示**（对应 issue #20），顺带避免 IDM 自动升级后激活失效；这是运行时改动，建议已用旧版的用户重新下载。**v1.4.1 起发布包统一叫 `IDM-Activation-Script.zip`（不带版本号）**，下载链接不再随版本变化；功能与 v1.4.0 完全一致，已下载 v1.4.0 的用户无需重新下载。
-
 > 安全起见建议校验：下载后在 PowerShell 中执行 `Get-FileHash .\IDM-Activation-Script.zip -Algorithm SHA256`，与 `.sha256` 文件内的值比对一致后再解压使用。若嫌麻烦，校验可略过。
-
-> **搜索关键词与长尾问题**：IDM 激活脚本中文版、Internet Download Manager 中文激活脚本、IDM 冻结试用期、IDM 试用期重置、IDM Windows 11 激活、IDM Windows 10 激活、IDM 批处理脚本、IDM GitHub 中文版、IDM 激活后仍提示注册、IDM 激活脚本乱码、IDM SmartScreen 阻止怎么办。
-
-> **运行说明**：本工具通过批处理脚本调整 Windows 注册表键值以完成激活，不修改 IDM 任何程序文件，所有注册表变更前均会自动备份，可随时还原。请在合法授权且理解风险的前提下使用，并遵守所在地法律法规与 IDM 软件许可协议。
 
 ## 📋 目录
 
-- [项目速览 / Project Overview](#项目速览--project-overview)
-- [搜索与 AI 摘要 / SEO & GEO Summary](#搜索与-ai-摘要--seo--geo-summary)
+- [项目简介](#项目简介)
 - [快速下载](#快速下载)
 - [功能特性](#功能特性)
 - [系统要求](#系统要求)
@@ -111,12 +63,10 @@
 - [文件说明](#文件说明)
 - [更新日志](#更新日志)
 - [维护与贡献](#维护与贡献)
-- [开源保障](#开源保障)
 - [相关链接](#相关链接)
 - [免责声明](#免责声明)
 - [许可证](#许可证)
 - [版本与维护](#版本与维护)
-- [GitHub Topics 建议](#github-topics-建议)
 
 ## ✨ 功能特性
 
@@ -472,71 +422,7 @@ C:\Windows\Temp\_Backup_HKU-[SID]_CLSID_[时间戳].reg
 - **常见问题补充**：新增 Q12（初始化卡死）、Q13（`[2]` 激活后弹"假序列号"/购买页 → 改用 `[1]` 冻结，对应 issue #17）、Q14（激活后浏览器打不开 1panel 等页面 = IDM 浏览器集成干扰，脚本不改动网络，对应 issue #18）。
 - 运行时发布包更新为 `IDM-Activation-Script-v1.3.9.zip`。
 
-### v1.3.8 - 2026-06-23
-
-- **纯文档修订**：统一上游署名为 `lstprjct/IDM-Activation-Script`（修正许可证段与 README 顶部/`llms.txt` 不一致）；修正 `docs/README.md` 里过时的新手指引（默认推荐改回 `[2]` 激活，与脚本实际一致）；补全 `docs/README.md` 与 `ARCHITECTURE.md` 的发布说明索引。**运行时脚本与发布包仍为 v1.3.7，SHA256 不变。**
-
-### v1.3.7 - 2026-06-14
-
-- **按用户状态细化模式选择说明**：没领过 30 天试用期 / 想直接能用 → `[2]` 激活（最常用）；已领取并在用 30 天试用期 → `[1]` 冻结（把试用期冻住）；`[2]` 激活后仍提示未注册时也用 `[1]` 冻结兜底。脚本逻辑与 v1.3.6 一致。
-
-### v1.3.6 - 2026-06-14
-
-- **修复"脚本目录不可写"误报**：环境自检的写入测试语句 `> file echo test >nul` 会被 `>nul` 覆盖导致永远写不进文件，进而误报目录不可写（对应 issue #11 #13 #14）。已改为 `(echo test)>file`。
-- **修复 `(x86)` 路径下提权崩溃**：安装目录含 `(x86)` 时，旧的 `Start-Process -FilePath \"%~f0\"` 写法会让 CMD 提前闭合引号、报"此时不应有 \Internet"（对应 issue #12）。改用单引号 + 标签跳转。
-- **修复 Win11 新版 WMI 自检误报**：`wmic` 在 Win11 24H2/25H2 已移除，自检改为优先用 PowerShell CIM 检测。
-- **大幅精简文件**：原 `测试脚本.cmd` / `快速激活.cmd` / `普通激活.cmd` / `重置激活.cmd` 合并为一个 `开始激活.cmd`，环境检测与三种激活模式都在里面。
-- `使用说明.txt` 改为 UTF-8 编码，避免在新版记事本中乱码。
-
-### v1.3.5 - 2026-05-25
-
-- 修复 `测试脚本.cmd` 对 `chcp` 输出的解析，避免 Windows 输出 ` 936` 时被误判为代码页非 936。
-- 新增 FAQ：说明冻结/激活后 IDM 自己启动时应检查 IDM 自身启动项、托盘驻留、浏览器集成或计划任务。
-- 新增运行时发布包 `release/IDM-Activation-Script-v1.3.5.zip` 与 SHA256 校验文件。
-
-### v1.3.4 (文档版本) - 2026-05-19
-
-#### ✅ 已完成
-- 新增 `llms.txt`，为 ChatGPT / Claude / Perplexity / Gemini 等 AI 搜索引擎提供精炼项目索引
-- README 顶部补充英文摘要、项目速览、开源原则、真实限制和 GitHub Topics 建议
-- 明确 v1.3.4 是文档专项更新，运行时发布包仍沿用 v1.3.3
-
-### v1.3.3 (当前运行时发布包) - 2026-04-27
-
-#### ✅ 已完成
-- README 顶部新增「搜索与 AI 摘要」，让 Google 与 AI 搜索更容易理解本项目适合谁、解决什么问题、如何使用
-- 快速下载、版本号、SHA256 校验说明同步到 v1.3.3
-- 发布包 `release/IDM-Activation-Script-v1.3.3.zip` 重新打包，面向小白保留一键入口、环境自检与完整使用说明
-
-### v1.3.1 - 2026-04-21
-
-#### ✅ 已完成
-- 新增 `普通激活.cmd` / `重置激活.cmd` 两个一键入口，与 `快速激活.cmd` 形成完整三件套
-- `测试脚本.cmd` 在结尾显式打印"第一项未通过的检查"，帮助用户快速定位问题
-- 修复 `快速激活.cmd` 在路径含单引号或特殊字符时 PowerShell 自动提权失败的问题
-- 常见问题新增 4 条（Win11 24H2 / Defender / WDAC / IDM 6.42+）
-- `SECURITY.md` 全文中文化，新增 `.github/ISSUE_TEMPLATE/bug_report.yml` 结构化 Bug 反馈模板
-- CI 新增 `IAS.cmd /silent` 冒烟探测（断言退出码 `2`），防止语法级回归进入主分支
-- 发布包 `release/IDM-Activation-Script-v1.3.1.zip` 重打，校验值同步更新
-
-### v1.3 - 2025-12-09
-
-#### ✅ 已完成
-- 新增静默/日志参数：`IAS.cmd` 支持 `/silent` 与 `/log=<路径>`，可在无人值守场景下抑制菜单交互并输出运行日志；`快速激活.cmd` 透传同样参数
-- 环境检测强化：`测试脚本.cmd` 扩展 PowerShell/WMI/IDM 路径/目录写权限等 10 项检查，退出码按位汇总便于自动化解析
-- CI 校验：新增 GitHub Actions（Windows）运行 `tools/validate.ps1`，强制批处理/文本文件保持 GBK 编码与 CRLF 行尾，并探测 cmd 语法可用性
-- 文档补充：新增执行流程说明与 v1.3 冒烟计划草稿，便于在管理员环境下快速回归
-
-### v1.2 - 2024-10-05
-
-#### ✅ 已完成
-- 脚本启动及关键交互中强制 `chcp 936`，并在执行 `cls` 后恢复代码页，保证 CMD 内中文显示正常
-- 主菜单与提示信息中文化，保留激活（冻结/普通）与重置三种模式
-- 保留自动注册表备份、网络检测与 CLSID 锁定等核心功能，单仓库即可完整使用
-- 新增 `快速激活.cmd`（冻结模式快捷方式）、`测试脚本.cmd`（环境检测）、`使用说明.txt`（快速上手指南）
-- `测试脚本.cmd` 补充 Null 服务、PowerShell 语言模式与 TCP 端口检测，失败时返回非零退出码
-- `快速激活.cmd` 在缺少 PowerShell 时提示手动提权，并向上传递 IAS 的返回码
-- 辅助批处理与文本全部统一为 GBK 编码，确保在中文 CMD 下无乱码
+更早版本（v1.3.8 及之前）的完整变更见 [`CHANGELOG.md`](./CHANGELOG.md)。
 
 ## 🧰 维护与贡献
 
@@ -548,10 +434,6 @@ C:\Windows\Temp\_Backup_HKU-[SID]_CLSID_[时间戳].reg
 - 安全漏洞上报：[SECURITY.md](./SECURITY.md)
 - CI 校验脚本：[tools/validate.ps1](./tools/validate.ps1)（在 GitHub Actions 的 `Windows validation` 工作流中执行）
 - 编码 / 换行约束：[.gitattributes](./.gitattributes)（`*.cmd` / `*.txt` 为 GBK + CRLF；`*.md` / `*.yml` 为 UTF-8 + LF）
-
-## 开源保障
-
-本仓库已经恢复为 GitHub `PUBLIC` 可见性，并在 GitHub Actions 中加入 `Guard public repository visibility` 检查。以后如果仓库再次被改成 private，只要触发 push、PR 或手动 CI，检查就会失败并提示必须改回 public。这个检查是为了避免开源仓库被误改成私有状态后长期没人发现。
 
 ## 🌐 相关链接
 
@@ -584,18 +466,9 @@ C:\Windows\Temp\_Backup_HKU-[SID]_CLSID_[时间戳].reg
 
 ## 🔄 版本与维护
 
-- 当前版本：**v1.4.1**（发布日期 2026-07-24，文档与运行时脚本包同步）
-- 运行时改动：v1.4.0 新增菜单 `[4]` 禁用 IDM 更新提示 / `[5]` 恢复更新提示（命令行 `/noupd` `/reupd`），通过 `HKCU\Software\DownloadManager` 下的 `CheckUpdtVM` 开关关闭 IDM 的自动更新检查；对应 issue #20，顺带避免 IDM 自动升级后激活失效。菜单编号相应顺延（下载 IDM → `[6]`，帮助 → `[7]`）。已用 v1.3.9 及更早版本的用户建议重新下载。v1.4.1 为打包与文档调整：发布包统一改名为不带版本号的 `IDM-Activation-Script.zip`，`release/` 只保留最新一份，脚本逻辑零改动。
-- 维护状态：独立维护，根据真实使用反馈持续迭代脚本与文档；仓库保持 GPL-3.0 开源
-- 仓库文件自洽：所有依赖项已包含在仓库内，可离线运行，无需额外下载其他组件
-- 中文编码约束：`.cmd` / `.txt` 强制 GBK + CRLF，`.md` 强制 UTF-8 + LF，由 GitHub Actions CI 自动校验，防止乱码误入主分支
-- CI 状态：每次 push / PR 都会触发 `Windows validation` 工作流（编码 / 换行 / `IAS.cmd /silent` 冒烟 / `IAS.cmd /noupd /silent` 深一层冒烟），徽章见页首
-
-## GitHub Topics 建议
-
-建议在 GitHub 仓库 About 区补充这些 Topics，帮助传统搜索和 GitHub 站内搜索理解项目类型：
-
-`idm`, `internet-download-manager`, `idm-activation-script`, `windows-batch`, `cmd-script`, `powershell`, `gbk`, `cp936`, `windows-11`, `chinese-localization`, `trial-reset`, `registry-backup`, `open-source`
+- 当前版本 **v1.4.1**（2026-07-24），文档与运行时脚本包同步。核心功能：`[1]` 冻结、`[2]` 激活、`[3]` 重置、`[4]`/`[5]` 禁用/恢复 IDM 更新提示。
+- 由本仓库独立维护，基于真实使用反馈持续迭代，保持 GPL-3.0 开源。
+- 所有依赖都在仓库内，可离线运行；每次 push / PR 都会跑 Windows CI 校验编码、行尾与脚本冒烟（徽章见页首）。
 
 ## Star History
 

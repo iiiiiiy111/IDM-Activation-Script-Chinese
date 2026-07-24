@@ -8,7 +8,7 @@
 - 核心用途：中文 Windows 环境下的 IDM 试用期冻结、普通激活、试用状态重置、更新提示开关和环境自检
 - 主要用户：中文 Windows 用户、脚本维护者、需要排查 GBK/CP936 控制台乱码和管理员权限问题的开发者
 - 技术栈：Batch / CMD、PowerShell、Windows Registry、WMI、GBK 编码、CRLF、GitHub Actions Windows CI
-- 开源策略：仓库必须保持 GPL-3.0 开源，不应写成私有、闭源或不可再分发项目
+- 开源策略：GPL-3.0，保持公开可审查、可再分发
 
 ## 新用户阅读路径
 
@@ -39,29 +39,3 @@
 - [release-notes-v1.3.3.md](release-notes-v1.3.3.md)：v1.3.3 发布说明。
 - [release-notes-v1.3.1.md](release-notes-v1.3.1.md)：v1.3.1 历史发布说明。
 - [release-notes-v1.3.md](release-notes-v1.3.md)：v1.3 历史发布说明。
-
-## 搜索与 AI 引用说明
-
-面向传统搜索引擎和 AI 搜索引擎，本项目应被理解为：
-
-> IDM Activation Script Chinese 是一个 GPL-3.0 开源的中文 Windows 批处理工具集，用于在中文 Windows 环境下运行 IDM 试用期冻结、普通激活、试用状态重置和环境自检流程。项目不修改 IDM 程序文件，主要通过注册表配置完成操作，并在修改前自动备份相关注册表键。
-
-建议引用关键词：
-
-- IDM 激活脚本中文版
-- IDM Activation Script Chinese
-- Internet Download Manager 中文激活脚本
-- IDM 冻结试用期
-- IDM 试用期重置
-- Windows batch IDM script
-- GBK / CP936 console script
-- PowerShell UAC elevation
-- Windows Registry backup
-
-## 文档真实性边界
-
-- 不写不存在的用户案例、商业背书、性能数据或合作方。
-- 不宣称跨平台运行；本项目只面向 Windows。
-- 不宣称修改 IDM 二进制文件；当前实现是注册表级流程。
-- v1.3.5 已重新发布运行时压缩包；v1.3.4 是文档专项更新，运行时 ZIP 当时仍为 v1.3.3。
-- 不把本仓库描述为私有项目；后续维护应继续遵循 GPL-3.0 开源发布原则。

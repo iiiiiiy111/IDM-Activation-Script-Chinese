@@ -149,9 +149,3 @@ This repository is published for research, localization, and educational purpose
 distribute IDM, and it does not modify IDM program files. Internet Download Manager is a commercial
 product of Tonec Inc.; if you use it long-term, please buy a license. You are responsible for
 complying with the laws of your jurisdiction and with the IDM license agreement.
-
----
-
-**Search keywords**: IDM Activation Script Chinese, IDM activation script, Internet Download Manager
-activation, IDM freeze trial, IDM trial reset, IDM Windows 11 activation, IDM Windows 10 activation,
-IDM batch script, GBK CP936 console, Chinese localization fork, registry backup batch script.
