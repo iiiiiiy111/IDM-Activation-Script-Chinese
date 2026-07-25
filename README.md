@@ -1,4 +1,4 @@
-# IDM 激活脚本中文版（IDM Activation Script · Simplified Chinese Edition）
+# IDM 激活脚本中文版（IDM Activation Script · 简体中文）
 
 [![Windows validation](https://github.com/tytsxai/IDM-Activation-Script-Chinese/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/tytsxai/IDM-Activation-Script-Chinese/actions/workflows/ci.yml)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL_v3-blue.svg)](./LICENSE)
@@ -12,9 +12,9 @@
 
 > **一键激活 Internet Download Manager（IDM）的中文脚本工具**：支持 IDM 冻结试用期、随机注册信息激活、试用期一键重置三种模式，并可一键禁用 / 恢复 IDM 的自动更新检查（不再反复弹更新窗），全程中文菜单与提示，无需安装任何依赖，单个 `.cmd` 文件即可在 Windows 7 / 8 / 10 / 11 上稳定运行。
 
-## 项目简介 / Overview
+## 项目简介
 
-**IDM 激活脚本中文版**（IDM Activation Script · Simplified Chinese Edition）是 [lstprjct/IDM-Activation-Script](https://github.com/lstprjct/IDM-Activation-Script) 的简体中文维护分支：全中文菜单、GBK/CP936 控制台编码、一键入口，把 Internet Download Manager（IDM）的**试用期冻结、随机注册信息激活、试用状态重置、关闭自动更新检查**封装成一个双击即用的批处理工具。不修改 IDM 程序文件，每次改注册表前自动备份，可离线运行。
+**IDM 激活脚本中文版**（IDM Activation Script）是 [lstprjct/IDM-Activation-Script](https://github.com/lstprjct/IDM-Activation-Script) 的简体中文维护分支：全中文菜单、GBK/CP936 控制台编码、一键入口，把 Internet Download Manager（IDM）的**试用期冻结、随机注册信息激活、试用状态重置、关闭自动更新检查**封装成一个双击即用的批处理工具。不修改 IDM 程序文件，每次改注册表前自动备份，可离线运行。
 
 | 项目 | 说明 |
 | --- | --- |
@@ -60,7 +60,7 @@
 
 ## 📋 目录
 
-- [项目简介 / Overview](#项目简介--overview)
+- [项目简介](#项目简介)
 - [快速下载](#快速下载)
 - [功能特性](#功能特性)
 - [系统要求](#系统要求)
