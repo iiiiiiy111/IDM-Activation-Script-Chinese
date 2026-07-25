@@ -1,4 +1,4 @@
-# IDM 激活脚本中文版 v1.4.1（IDM Activation Script · 简体中文）
+# IDM 激活脚本中文版（IDM Activation Script · Simplified Chinese Edition）
 
 [![Windows validation](https://github.com/tytsxai/IDM-Activation-Script-Chinese/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/tytsxai/IDM-Activation-Script-Chinese/actions/workflows/ci.yml)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL_v3-blue.svg)](./LICENSE)
@@ -12,11 +12,20 @@
 
 > **一键激活 Internet Download Manager（IDM）的中文脚本工具**：支持 IDM 冻结试用期、随机注册信息激活、试用期一键重置三种模式，并可一键禁用 / 恢复 IDM 的自动更新检查（不再反复弹更新窗），全程中文菜单与提示，无需安装任何依赖，单个 `.cmd` 文件即可在 Windows 7 / 8 / 10 / 11 上稳定运行。
 
-## 项目简介
+## 项目简介 / Overview
 
-面向中文 Windows 用户的 IDM 激活脚本工具集：中文菜单、GBK/CP936 控制台编码、一键入口，封装了试用期冻结、随机注册信息激活、试用状态重置，以及关闭 / 恢复 IDM 自动更新检查。纯批处理加一小段 PowerShell，不修改 IDM 程序文件，每次改注册表前都会自动备份，可离线运行。
+**IDM 激活脚本中文版**（IDM Activation Script · Simplified Chinese Edition）是 [lstprjct/IDM-Activation-Script](https://github.com/lstprjct/IDM-Activation-Script) 的简体中文维护分支：全中文菜单、GBK/CP936 控制台编码、一键入口，把 Internet Download Manager（IDM）的**试用期冻结、随机注册信息激活、试用状态重置、关闭自动更新检查**封装成一个双击即用的批处理工具。不修改 IDM 程序文件，每次改注册表前自动备份，可离线运行。
 
-主要解决中文 Windows 上的这些麻烦：英文 IDM 脚本在中文 CMD / PowerShell 里乱码；新手不清楚该运行哪个文件、要不要管理员权限、怎么处理 SmartScreen / Defender 拦截；激活或试用状态出问题后，需要一个可回退、可排查的处理流程。
+| 项目 | 说明 |
+| --- | --- |
+| **是什么** | 面向中文 Windows 的 Internet Download Manager（IDM）激活与试用期管理批处理脚本 |
+| **解决什么** | 英文 IDM 脚本在中文 CMD/PowerShell 里乱码；新手不知道该运行哪个文件、要不要管理员权限、怎么处理 SmartScreen/Defender 拦截；激活或试用状态异常后缺一个可回退、可排查的处理流程 |
+| **适合谁** | 中文 Windows 7 / 8 / 8.1 / 10 / 11 用户；以及想研究 Windows 批处理、注册表操作、GBK/CP936 控制台兼容的开发者 |
+| **核心功能** | `[1]` 冻结试用期 · `[2]` 随机注册信息激活 · `[3]` 重置激活/试用 · `[4]`/`[5]` 禁用/恢复 IDM 自动更新检查 · 运行前环境自检 · 注册表自动备份可还原 |
+| **技术栈** | Windows Batch/CMD · PowerShell（UAC 提权、环境探测）· Windows 注册表 / WMI / CIM · GBK / CP936 + CRLF · GitHub Actions（`windows-latest`）CI |
+| **支持平台** | Windows 7 / 8 / 8.1 / 10 / 11（含 24H2）；仅 Windows，macOS / Linux 不支持 |
+| **许可证** | GPL-3.0，公开可审查、可自由再分发 |
+| **不包含** | 不含 IDM 安装包，不修改 IDM 程序文件，不绕过企业策略（WDAC / AppLocker） |
 
 **核心入口**
 
@@ -27,13 +36,12 @@
 
 > 从 v1.3.6 起，原来的四个脚本已合并为一个 `开始激活.cmd`，新手只需双击它。
 
-**限制**
+**限制与注意**
 
-- 仅支持 Windows；macOS / Linux 无法运行这些 `.cmd` 脚本。
-- 会修改 IDM 相关注册表键（运行前自动备份），建议只在自己可控的设备上使用。
-- 不修改 IDM 程序文件，不含 IDM 安装包，也不绕过企业策略（WDAC / AppLocker）。
+- 会修改 IDM 相关注册表键（运行前自动备份、可还原），建议只在自己可控的设备上使用。
 - SmartScreen / Defender / 第三方杀软可能拦截未签名批处理，属常见误报；可先校验 SHA256 再运行。
-- 请在合法授权且理解风险的前提下使用，遵守当地法律法规与 IDM 许可协议。
+- 企业环境的 WDAC / AppLocker 策略会拦截未签名脚本，这是 IT 策略层面的限制，应联系管理员而非绕过。
+- 请在合法授权且理解风险的前提下使用，遵守当地法律法规与 IDM 软件许可协议。
 
 ## 📥 快速下载
 
@@ -52,7 +60,7 @@
 
 ## 📋 目录
 
-- [项目简介](#项目简介)
+- [项目简介 / Overview](#项目简介--overview)
 - [快速下载](#快速下载)
 - [功能特性](#功能特性)
 - [系统要求](#系统要求)

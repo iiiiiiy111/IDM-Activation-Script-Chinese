@@ -1,4 +1,4 @@
-# IDM Activation Script — Simplified Chinese Edition (v1.4.1)
+# IDM Activation Script — Simplified Chinese Edition
 
 [![Windows validation](https://github.com/tytsxai/IDM-Activation-Script-Chinese/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/tytsxai/IDM-Activation-Script-Chinese/actions/workflows/ci.yml)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL_v3-blue.svg)](./LICENSE)

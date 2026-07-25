@@ -1,6 +1,6 @@
 # IDM Activation Script Chinese / IDM 激活脚本中文版
 
-> GPL-3.0 open-source Chinese-localized `.cmd` batch toolkit for Internet Download Manager (IDM) on Windows 7/8/10/11. Four functions: random-registration activation (推荐, works immediately, no account/trial needed), freeze trial (fallback if IDM still shows unregistered), trial reset, and (since v1.4.0) a one-click switch that disables or restores IDM's automatic update check so it stops popping up "new version available" dialogs. No dependencies, runs from a single `.cmd` file, all menus and prompts in Simplified Chinese.
+> GPL-3.0 open-source Chinese-localized `.cmd` batch toolkit for Internet Download Manager (IDM) on Windows 7/8/8.1/10/11. Four functions: random-registration activation (推荐, works immediately, no account/trial needed), freeze trial (fallback if IDM still shows unregistered), trial reset, and (since v1.4.0) a one-click switch that disables or restores IDM's automatic update check so it stops popping up "new version available" dialogs. No dependencies, runs from a single `.cmd` file, all menus and prompts in Simplified Chinese.
 
 This is a Chinese-language fork that wraps the well-known IDM-Activation-Script flow with GBK-encoded batch files, an explicit Chinese console layer (`chcp 936`), automatic registry backup, an environment self-check script, and SHA256-verified release ZIPs.
 
