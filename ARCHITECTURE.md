@@ -44,6 +44,9 @@
   - 维护约束：`docs/` 作为公开维护资料随仓库保留；发版时应同步 README / CHANGELOG / llms.txt 中的用户可见信息，避免公开文档互相矛盾。
 - `release/`
   - 发布产物：`IDM-Activation-Script.zip` 与同名 `.sha256` 校验文件（v1.4.1 起固定文件名、不带版本号；目录内只保留最新一份。历史版本入口按版本不同——v1.3.3 及以后在对应 tag 的 Release Assets 里，v1.3 / v1.3.1 从未发过 Release、只能从 Git 历史取回）。约定见 `release/README.md`。
+- `.gitignore`
+  - 只覆盖「开发或运行本仓库真的会掉出来的东西」：`开始激活.cmd` 的目录可写性自检文件 `.__ias_write_test.tmp`（正常路径自删，用户中断时残留）、`/log=路径` 可能落进仓库的 `*.log`、编辑器备份与 macOS/Windows 系统垃圾。
+  - 维护约束：`release/` 下的 zip 与 `.sha256` 是被跟踪的对外交付物，因此刻意不写 `*.zip` 一类会误伤它们的规则。新增规则前先跑 `git check-ignore -v $(git ls-files)` 确认没有命中已跟踪文件。
 
 ## 关键约束（高风险点）
 

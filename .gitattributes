@@ -29,3 +29,4 @@ llms.txt text eol=lf
 # which machine packed it.
 LICENSE text eol=lf
 .gitattributes text eol=lf
+.gitignore text eol=lf
