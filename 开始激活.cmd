@@ -24,6 +24,10 @@ where powershell.exe >nul 2>&1 || goto :noPS
 ::     /frz /silent，提权后的窗口却弹出了交互菜单。
 set "psSelf=%self:'=''%"
 set "psArgs=%*"
+::  先剥掉双引号再拼进 PowerShell 命令串，否则 /log="C:\x.log" 这种写法里的
+::  引号会提前截断外层的 -Command "..."。IAS.cmd 的参数解析本来也会剥引号，
+::  所以这里剥掉不会改变它看到的参数。
+if defined psArgs set psArgs=!psArgs:"=!
 if defined psArgs set "psArgs=!psArgs:'=''!"
 
 if defined psArgs (
