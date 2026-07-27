@@ -42,9 +42,17 @@
 
 【高级用法（命令行 / 无人值守，可选）】
   以管理员身份打开 CMD，执行：
-     IAS.cmd /act /silent /log="C:\Temp\ias.log"
+     IAS.cmd /act /silent /log=C:\Temp\ias.log
   /act=激活（推荐）  /frz=冻结  /res=重置  /noupd=禁用更新提示  /reupd=恢复更新提示；
   加 /silent 为静默模式，成功退出码为 0。
+  /log 可省略路径，日志会写到 C:\Windows\Temp\IAS-<时间戳>.log；写路径时
+  不要带空格。开始激活.cmd 也接受同样的参数，会原样转交给 IAS.cmd。
+
+【出问题了想找证据 / 想还原】
+  日志：加 /log 参数重跑一次，脚本会把日志文件路径打印在屏幕上。
+  还原：每次运行前都会把注册表备份到 C:\Windows\Temp，文件名形如
+        _Backup_HKCU_CLSID_<时间戳>.reg，双击导入即可还原。
+        备份和日志不会自动清理，确认 IDM 正常后可以自行删掉。
 
 【更多帮助 / 反馈问题】
   https://github.com/tytsxai/IDM-Activation-Script-Chinese/issues

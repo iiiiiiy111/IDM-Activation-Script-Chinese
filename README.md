@@ -162,10 +162,18 @@ IAS.cmd /noupd
 IAS.cmd /reupd
 
 # 静默模式 + 日志（无人值守）
-IAS.cmd /act /silent /log="C:\Temp\ias.log"
+IAS.cmd /act /silent /log=C:\Temp\ias.log
 ```
 
-> 说明：`/silent` 抑制菜单与等待，`/log=路径` 记录运行日志；未带 `/frz` `/act` `/res` `/noupd` `/reupd` 即开启静默将返回码 2。同时给 `/noupd` 和 `/reupd` 时以 `/noupd` 为准。
+> 说明：`/silent` 抑制菜单与等待；未带 `/frz` `/act` `/res` `/noupd` `/reupd` 即开启静默将返回码 2。同时给 `/noupd` 和 `/reupd` 时以 `/noupd` 为准。
+>
+> 日志：
+> - `/log` 不带路径 → 写到 `%SystemRoot%\Temp\IAS-<时间戳>.log`，脚本启动时会把完整路径打印出来；
+> - `/log=路径` → 写到指定文件（目录不存在会自动创建；写不进去会提示并回退到上面的默认位置）；
+> - `/silent` 会自动开启日志，不用再写 `/log`；
+> - **路径里不要有空格**：参数按空格切分，`C:\My Logs\ias.log` 会被截断。反馈问题时附上这个日志文件最有用。
+
+`开始激活.cmd` 会把收到的参数原样透传给 `IAS.cmd`。但如果它不是以管理员身份启动的，会先弹 UAC 重开一个进程，**原窗口拿不到新进程的退出码**；需要按退出码判断结果的自动化调用，请以管理员身份直接执行 `IAS.cmd`。
 
 </details>
 
@@ -210,7 +218,7 @@ IAS.cmd /act /silent /log="C:\Temp\ias.log"
 | 用 `[2]` 激活后 IDM 弹"未注册 / 假序列号" | 先 `[3]` 重置，再 `[1]` 冻结（见 [Q13](#常见问题)） |
 | 升级 IDM 后激活失效 | `[3]` 重置 → 重新 `[2]` 或 `[1]`，再用 `[4]` 关掉自动更新 |
 | IDM 反复弹"发现新版本" | 菜单 `[4]` 禁用更新提示，需要时 `[5]` 恢复 |
-| 自己有多台机器，想免交互执行 | `IAS.cmd /act /silent /log="C:\Temp\ias.log"`，按退出码判断结果 |
+| 自己有多台机器，想免交互执行 | `IAS.cmd /act /silent /log=C:\Temp\ias.log`，按退出码判断结果 |
 | 想改回原样、不再使用本脚本 | `[3]` 重置，或导入 `C:\Windows\Temp` 下的 `.reg` 备份还原 |
 | 想研究 Windows 批处理 / 注册表 ACL / GBK 控制台兼容 | 直接读 `IAS.cmd`，结构说明见 [ARCHITECTURE.md](./ARCHITECTURE.md) |
 
@@ -419,7 +427,7 @@ IAS.cmd /act /silent /log="C:\Temp\ias.log"
 | `1` | 进入业务流程但未成功：未检测到 IDM 安装、注册表读写失败、IDM 下载测试失败等 |
 | `2` | 环境或参数错误：静默模式未带动作参数、系统版本不支持、缺 PowerShell、缺管理员权限、WMI 失败、临时目录被阻止运行等 |
 
-`开始激活.cmd` 在自检发现问题且用户选择退出时返回 `1`，其余情况原样透传 `IAS.cmd` 的退出码。
+`开始激活.cmd` 在自检发现问题且用户选择退出时返回 `1`；已经是管理员时透传 `IAS.cmd` 的退出码。若它需要先弹 UAC 提权，激活流程会在新进程里跑，原窗口无法回收退出码 —— 这种场景请以管理员身份直接调用 `IAS.cmd`。
 
 ### 注册表备份
 
@@ -430,7 +438,9 @@ C:\Windows\Temp\_Backup_HKCU_CLSID_[时间戳].reg
 C:\Windows\Temp\_Backup_HKU-[SID]_CLSID_[时间戳].reg
 ```
 
-**恢复方法：** 双击 `.reg` 文件即可导入恢复
+**恢复方法：** 双击 `.reg` 文件即可导入恢复。脚本每次跑完（含失败退出）都会把本次备份的文件名模式打印在结尾，照着去 `C:\Windows\Temp` 找即可。
+
+**注意：** 备份文件和运行日志**不会自动清理**，每运行一次就多一份（CLSID 分支导出可能有几 MB）。确认 IDM 工作正常后，可以自行删除 `C:\Windows\Temp` 下的 `_Backup_*_CLSID_*.reg` 与 `IAS-*.log`。
 
 ### 编码说明
 

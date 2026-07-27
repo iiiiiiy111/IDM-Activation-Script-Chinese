@@ -57,7 +57,7 @@ IAS.cmd /frz                                   :: freeze the current 30-day tria
 IAS.cmd /res                                   :: reset activation / trial state
 IAS.cmd /noupd                                 :: disable IDM's automatic update check
 IAS.cmd /reupd                                 :: restore IDM's automatic update check
-IAS.cmd /act /silent /log="C:\Temp\ias.log"    :: unattended run with a log file
+IAS.cmd /act /silent /log=C:\Temp\ias.log    :: unattended run with a log file
 ```
 
 `/silent` without one of `/frz` `/act` `/res` `/noupd` `/reupd` exits with code `2`.
