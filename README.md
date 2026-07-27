@@ -2,7 +2,7 @@
 
 [![Windows validation](https://github.com/tytsxai/IDM-Activation-Script-Chinese/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/tytsxai/IDM-Activation-Script-Chinese/actions/workflows/ci.yml)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL_v3-blue.svg)](./LICENSE)
-[![Version](https://img.shields.io/badge/version-v1.4.1-brightgreen.svg)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-v1.4.2-brightgreen.svg)](./CHANGELOG.md)
 [![Platform](https://img.shields.io/badge/platform-Windows%207%20%7C%208%20%7C%2010%20%7C%2011-blue.svg)](#系统要求)
 [![Release](https://img.shields.io/github/v/release/tytsxai/IDM-Activation-Script-Chinese)](https://github.com/tytsxai/IDM-Activation-Script-Chinese/releases)
 
@@ -469,7 +469,17 @@ C:\Windows\Temp\_Backup_HKU-[SID]_CLSID_[时间戳].reg
 
 > 完整历史变更请查看 [`CHANGELOG.md`](./CHANGELOG.md)。下方仅保留最近几个版本的摘要。
 
-### v1.4.1 (当前版本) - 2026-07-24
+### v1.4.2 (当前版本) - 2026-07-28
+
+上线前的稳定性补强，**激活 / 冻结 / 重置 / 更新开关的逻辑一行未动**。
+
+- **修复日志文件名一直无效**：生成文件名的几行原本写在 `if (...)` 代码块内，CMD 会在整块解析时一次性展开 `%_logstamp%`，取不到上一行刚写入的值——所有静默运行的日志都叫 `IAS-%_logstamp%.log`、追加进同一个文件。
+- **`/log=路径` 真正可用**：文档一直写着这个用法，但参数解析只认不带路径的 `/log`，按文档传路径时日志会被静默写去别处。
+- **`开始激活.cmd` 提权时不再丢参数**：以非管理员身份带参数运行（如 `/frz /silent`）时，参数会被静默丢弃、提权后弹出的是交互菜单。顺带修了含 `'` 的目录路径导致提权语法出错的问题。
+- **收尾会打印备份与日志位置**：失败退出时也会显示，不用再翻文档猜路径。
+- **新增发布包一致性守卫**：CI 会校验 `release/` 里的包与仓库逐字节一致、SHA256 正确、版本号自洽——「改了脚本忘了重新打包」以前没有任何征兆。
+
+### v1.4.1 - 2026-07-24
 
 - **发布包改用固定文件名 `IDM-Activation-Script.zip`**（不带版本号）：以前每发一版就多一个 `IDM-Activation-Script-v<版本>.zip`，README / `llms.txt` / `README.en.md` 的下载链接每次都要跟着改，漏改就会指向旧包。现在链接一次写死、永远指向最新版；版本号由 Git tag、Release 标题、`CHANGELOG.md` 和 `IAS.cmd` 的 `iasver` 标识。
 - **`release/` 只保留一份最新发布包**：历史版本改由 [GitHub Releases](https://github.com/tytsxai/IDM-Activation-Script-Chinese/releases) 各 tag 页面的 Assets 长期提供，仓库内副本可在 Git 历史中找回；新增 `release/README.md` 说明该约定。
@@ -537,7 +547,7 @@ C:\Windows\Temp\_Backup_HKU-[SID]_CLSID_[时间戳].reg
 
 ## 版本与维护
 
-- 当前版本 **v1.4.1**（2026-07-24），文档与运行时脚本包同步。核心功能：`[1]` 冻结、`[2]` 激活、`[3]` 重置、`[4]`/`[5]` 禁用/恢复 IDM 更新提示。
+- 当前版本 **v1.4.2**（2026-07-28），文档与运行时脚本包同步。核心功能：`[1]` 冻结、`[2]` 激活、`[3]` 重置、`[4]`/`[5]` 禁用/恢复 IDM 更新提示。
 - 由本仓库独立维护，基于真实使用反馈持续迭代，保持 GPL-3.0 开源。
 - 运行所需文件全在仓库内，不下载任何第三方组件（`[1]` / `[2]` 收尾的 IDM 下载测试需要联网，见[系统要求](#系统要求)）；每次 push / PR 都会跑 Windows CI 校验编码、行尾与脚本冒烟（徽章见页首）。
 

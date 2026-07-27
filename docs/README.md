@@ -31,6 +31,7 @@
 
 ## 发布说明
 
+- [release-notes-v1.4.2.md](release-notes-v1.4.2.md)：v1.4.2 上线前稳定性补强——修复日志文件名一直无效、`/log=路径` 文档写了但没实现、`开始激活.cmd` 提权时丢参数；新增发布包一致性守卫与打包脚本。激活逻辑零改动。
 - [release-notes-v1.4.1.md](release-notes-v1.4.1.md)：v1.4.1 发布包改用固定文件名 `IDM-Activation-Script.zip`，`release/` 只保留最新一份，脚本逻辑零改动。
 - [release-notes-v1.4.0.md](release-notes-v1.4.0.md)：v1.4.0 新增"禁用 / 恢复 IDM 更新提示"（菜单 `[4]`/`[5]`、参数 `/noupd` `/reupd`），对应 issue #20。
 - [release-notes-v1.3.8.md](release-notes-v1.3.8.md)：v1.3.8 纯文档修订，统一上游署名、修正过时的新手指引、补全发布说明索引（运行时脚本与发布包仍为 v1.3.7）。

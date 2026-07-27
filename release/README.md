@@ -13,7 +13,7 @@
 
 版本号并没有消失，由这几处标识：
 
-- Git tag（如 `v1.4.1`）与对应的 [GitHub Release](https://github.com/tytsxai/IDM-Activation-Script-Chinese/releases) 标题；
+- Git tag（如 `v1.4.2`）与对应的 [GitHub Release](https://github.com/tytsxai/IDM-Activation-Script-Chinese/releases) 标题；
 - [`CHANGELOG.md`](../CHANGELOG.md) 与 `docs/release-notes-*.md`；
 - `IAS.cmd` 里的 `iasver`，脚本运行时会显示在窗口标题和菜单上方。
 
