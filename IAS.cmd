@@ -23,8 +23,8 @@ chcp 936 >nul 2>&1
 ::   487-585 行 : 重置流程与注册表删除队列
 ::   590-670 行 : 禁用 / 恢复 IDM 自动更新检查（CheckUpdtVM）
 ::   671-920 行 : 激活与冻结核心流程、注册表备份、随机注册信息注入、收尾输出
-::   923-1105 行: CLSID 扫描（PowerShell 内嵌段）
-::   1107-1189 行: 退出码记账、日志子程序（:parse_logarg / :init_log / :log）、着色输出
+::   929-1111 行: CLSID 扫描（PowerShell 内嵌段）
+::   1113-1196 行: 退出码记账、日志子程序（:extract_logpath / :init_log / :log）、着色输出
 ::
 ::============================================================================
 
@@ -106,9 +106,14 @@ if /i "%%A"=="/reupd" set _reupd=1
 if /i "%%A"=="/silent" set _silent=1
 if /i "%%A"=="/quiet" set _silent=1
 if /i "%%A"=="/log" set _log=1
-call :parse_logarg "%%A"
 )
 )
+
+::  /log=路径 的路径要单独提取，不能靠上面的 for 循环：for %%A in (...) 的
+::  集合解析把 = 也当分隔符，"/log=C:\x.log" 在那里已经被拆成 "/log" 和
+::  "C:\x.log" 两个 token，比较得到的只会是 "/log"。所以直接从完整参数串里取。
+set "_logpath="
+if defined _args echo %_args%| find /i "/log=" >nul 2>&1 && call :extract_logpath
 
 if %_noupd%==1 if %_reupd%==1 set _reupd=0
 
@@ -1111,17 +1116,18 @@ if "%exit_code%"=="0" set "exit_code=%~1"
 if not "%~2"=="" call :log %~2
 exit /b
 
-:parse_logarg
+:extract_logpath
 
-::  识别 /log=路径 形式（/log 不带路径由上面的等值比较处理）。
-::  注意：参数解析前已经用 %_args:"=% 去掉了所有引号，因此路径中不能含空格。
+::  从完整参数串里取出 /log= 后面的路径。
+::  第一个 for 按 = 切，token 2 是第一个 = 之后的全部内容（"C:\x.log /silent"）；
+::  第二个 for 按空格切，token 1 就是路径本身。
+::  参数解析前已经用 %_args:"=% 去掉了所有引号，所以路径不能含空格。
+::  取到的东西若以 / 开头，说明用户写的是 "/log= /silent" 这类空路径，忽略掉。
 
-set "_pa=%~1"
-if not defined _pa exit /b
-if /i not "%_pa:~0,5%"=="/log=" exit /b
-if "%_pa:~5%"=="" exit /b
-set _log=1
-set "_logpath=%_pa:~5%"
+for /f "tokens=2 delims==" %%a in ("%_args%") do for /f "tokens=1" %%b in ("%%a") do set "_logpath=%%b"
+if not defined _logpath exit /b
+if "%_logpath:~0,1%"=="/" set "_logpath="
+if defined _logpath set _log=1
 exit /b
 
 :init_log
