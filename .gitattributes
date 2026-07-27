@@ -22,3 +22,10 @@ llms.txt text eol=lf
 # published SHA256 stops matching what users download.
 *.zip binary
 *.sha256 text eol=lf
+
+# Extensionless text files need an explicit rule too. Without one, a Windows
+# checkout with core.autocrlf=true (the default on GitHub's Windows runners)
+# rewrites LICENSE to CRLF, so the release bundle's contents would depend on
+# which machine packed it.
+LICENSE text eol=lf
+.gitattributes text eol=lf
