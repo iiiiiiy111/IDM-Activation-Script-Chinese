@@ -14,3 +14,11 @@ llms.txt text eol=lf
 # GitHub Actions / Issue templates (YAML must be LF)
 *.yml text eol=lf
 *.yaml text eol=lf
+
+# CI helper scripts (run via pwsh, LF is fine and keeps diffs clean)
+*.ps1 text eol=lf
+
+# Release bundle: never let any EOL/text heuristic touch these bytes, or the
+# published SHA256 stops matching what users download.
+*.zip binary
+*.sha256 text eol=lf

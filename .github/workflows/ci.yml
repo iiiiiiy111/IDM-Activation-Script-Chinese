@@ -56,3 +56,89 @@ jobs:
           )
           echo Smoke probe OK: IAS.cmd /noupd /silent exited with 1 as expected.
           exit /b 0
+
+      # /act 与 /frz 在检查完 IDM 是否安装之前不碰注册表、不联网，
+      # 所以在没装 IDM 的 runner 上跑到"未检测到 IDM 安装"就会退出，是安全的。
+      - name: Smoke probe — IAS.cmd /act and /frz without IDM installed (expect exit 1)
+        shell: cmd
+        run: |
+          chcp 936 >nul
+          call IAS.cmd /act /silent
+          if %errorlevel% NEQ 1 (
+            echo ::error::IAS.cmd /act /silent should exit with 1 when IDM is not installed, got %errorlevel%
+            exit /b 1
+          )
+          call IAS.cmd /frz /silent
+          if %errorlevel% NEQ 1 (
+            echo ::error::IAS.cmd /frz /silent should exit with 1 when IDM is not installed, got %errorlevel%
+            exit /b 1
+          )
+          echo Smoke probe OK: /act and /frz both exited with 1 as expected.
+          exit /b 0
+
+      - name: Smoke probe — logging (/log= custom path and default log file)
+        shell: cmd
+        run: |
+          chcp 936 >nul
+          del /f /q "%SystemRoot%\Temp\IAS-*.log" >nul 2>&1
+          del /f /q "C:\ias-ci-custom.log" >nul 2>&1
+          call IAS.cmd /noupd /silent /log=C:\ias-ci-custom.log
+          if %errorlevel% NEQ 1 (
+            echo ::error::IAS.cmd /noupd /silent /log=... should exit with 1, got %errorlevel%
+            exit /b 1
+          )
+          if not exist "C:\ias-ci-custom.log" (
+            echo ::error::/log=PATH did not create the log file; the documented /log=PATH form is broken again.
+            exit /b 1
+          )
+          call IAS.cmd /noupd /silent
+          if %errorlevel% NEQ 1 (
+            echo ::error::IAS.cmd /noupd /silent should exit with 1, got %errorlevel%
+            exit /b 1
+          )
+          echo Smoke probe OK: both /log=PATH and the default log path produced a log file.
+          exit /b 0
+
+      # 回归守卫：日志文件名生成如果被搬回 if(...) 代码块里，%_logstamp% 会在整块
+      # 解析时一次性展开，文件名退化成字面量 IAS-%_logstamp%.log，所有静默运行
+      # 都追加到同一个文件。这里断言默认日志名里确实带上了时间戳。
+      - name: Assert default log file name carries a real timestamp
+        shell: pwsh
+        run: |
+          $logs = @(Get-ChildItem -Path "$env:SystemRoot\Temp\IAS-*.log" -ErrorAction SilentlyContinue)
+          if ($logs.Count -eq 0) {
+            Write-Host "::error::No default log file was produced in %SystemRoot%\Temp."
+            exit 1
+          }
+          foreach ($log in $logs) {
+            if ($log.Name -like '*_logstamp*') {
+              Write-Host "::error::Log file name degraded to a literal: $($log.Name). The %_logstamp% expansion regressed."
+              exit 1
+            }
+          }
+          Write-Host "Log file name OK: $($logs[0].Name)"
+
+      # 发布包校验放在所有脚本冒烟之后：一个过期的发布包不应该掩盖脚本本身的
+      # 冒烟结果。前面全绿、只有这一步红，就等于「代码是好的，但包没重新打」。
+      - name: Verify release bundle matches the repository
+        shell: pwsh
+        run: ./tools/verify-release.ps1
+
+      # 必须排在校验之后：先跑打包会把 release/ 刷成最新，校验就永远是假绿。
+      # if: always() 是为了在校验失败时也产出一份打好的包 —— 维护者（可能在
+      # macOS 上，没法生成 GBK 条目名的 zip）直接下载这个 artifact 放回
+      # release/ 提交即可，不用再去找一台 Windows。
+      - name: Rebuild release bundle for maintainers
+        if: always()
+        shell: pwsh
+        run: ./tools/pack-release.ps1
+
+      - name: Upload rebuilt release bundle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-bundle-rebuilt
+          path: |
+            release/IDM-Activation-Script.zip
+            release/IDM-Activation-Script.zip.sha256
+          if-no-files-found: error
