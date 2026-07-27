@@ -15,15 +15,16 @@ chcp 936 >nul 2>&1
 ::   Ðí¿ÉÖ¤  : GPL-3.0£¨Ïê¼û²Ö¿â¸ùÄ¿Â¼ LICENSE£©
 ::
 ::   ----- ´úÂëµ¼º½£¨±ãÓÚºóÐøÎ¬»¤£© -----
-::   01-045 ÐÐ  : Í·²¿ÔªÐÅÏ¢¡¢´úÂëÒ³ÉèÖÃ¡¢Ä¬ÈÏ¿ª¹Ø
-::   045-115 ÐÐ : PATH ÉèÖÃ¡¢Sysnative / SysArm32 ¼Ü¹¹ÖØÈë¡¢²ÎÊý½âÎö£¨/act /frz /res /noupd /reupd /silent /log£©
-::   115-155 ÐÐ : ¾²Ä¬Ä£Ê½Ð£Ñé¡¢Null ·þÎñ¼ì²â¡¢ÈÕÖ¾³õÊ¼»¯
-::   155-405 ÐÐ : »·¾³Ì½²â£¨¹ÜÀíÔ±È¨ÏÞ¡¢IDM °²×°Â·¾¶¡¢CLSID ×¢²á±íÏî¡¢ÍøÂçÁ¬Í¨ÐÔ£©
-::   405-490 ÐÐ : Ö÷²Ëµ¥£¨¶³½á / ¼¤»î / ÖØÖÃ / ¸üÐÂ¿ª¹Ø / ÏÂÔØ / °ïÖú£©£¬½»»¥·ÖÅÉ
-::   490-600 ÐÐ : ÖØÖÃÁ÷³ÌÓë×¢²á±íÉ¾³ý¶ÓÁÐ
-::   600-700 ÐÐ : ½ûÓÃ / »Ö¸´ IDM ×Ô¶¯¸üÐÂ¼ì²é£¨CheckUpdtVM£©
-::   700-950 ÐÐ : ¼¤»îÓë¶³½áºËÐÄÁ÷³Ì¡¢×¢²á±í±¸·Ý¡¢Ëæ»ú×¢²áÐÅÏ¢×¢Èë
-::   950-1100 ÐÐ: CLSID É¨Ãè£¨PowerShell ÄÚÇ¶¶Î£©¡¢´íÎó´¦Àí¡¢ÈÕÖ¾ÊÕÎ²¡¢ÍË³öÂë
+::   001-045 ÐÐ : Í·²¿ÔªÐÅÏ¢¡¢´úÂëÒ³ÉèÖÃ¡¢Ä¬ÈÏ¿ª¹Ø
+::   045-115 ÐÐ : PATH ÉèÖÃ¡¢Sysnative / SysArm32 ¼Ü¹¹ÖØÈë¡¢²ÎÊý½âÎö£¨/act /frz /res /noupd /reupd /silent /log[=Â·¾¶]£©
+::   115-150 ÐÐ : ÈÕÖ¾³õÊ¼»¯¡¢¾²Ä¬Ä£Ê½Ð£Ñé¡¢Null ·þÎñ¼ì²â
+::   150-440 ÐÐ : »·¾³Ì½²â£¨¹ÜÀíÔ±È¨ÏÞ¡¢IDM °²×°Â·¾¶¡¢CLSID ×¢²á±íÏî¡¢ÍøÂçÁ¬Í¨ÐÔ£©
+::   445-485 ÐÐ : Ö÷²Ëµ¥£¨¶³½á / ¼¤»î / ÖØÖÃ / ¸üÐÂ¿ª¹Ø / ÏÂÔØ / °ïÖú£©£¬½»»¥·ÖÅÉ
+::   487-585 ÐÐ : ÖØÖÃÁ÷³ÌÓë×¢²á±íÉ¾³ý¶ÓÁÐ
+::   590-670 ÐÐ : ½ûÓÃ / »Ö¸´ IDM ×Ô¶¯¸üÐÂ¼ì²é£¨CheckUpdtVM£©
+::   671-920 ÐÐ : ¼¤»îÓë¶³½áºËÐÄÁ÷³Ì¡¢×¢²á±í±¸·Ý¡¢Ëæ»ú×¢²áÐÅÏ¢×¢Èë¡¢ÊÕÎ²Êä³ö
+::   923-1105 ÐÐ: CLSID É¨Ãè£¨PowerShell ÄÚÇ¶¶Î£©
+::   1107-1189 ÐÐ: ÍË³öÂë¼ÇÕË¡¢ÈÕÖ¾×Ó³ÌÐò£¨:parse_logarg / :init_log / :log£©¡¢×ÅÉ«Êä³ö
 ::
 ::============================================================================
 
@@ -105,6 +106,7 @@ if /i "%%A"=="/reupd" set _reupd=1
 if /i "%%A"=="/silent" set _silent=1
 if /i "%%A"=="/quiet" set _silent=1
 if /i "%%A"=="/log" set _log=1
+call :parse_logarg "%%A"
 )
 )
 
@@ -116,16 +118,10 @@ if %_silent%==1 set _log=1
 
 set "log_dir=%SystemRoot%\Temp"
 if %_log%==1 (
-if not exist "%log_dir%" md "%log_dir%"
-set "_logstamp=%date%_%time%"
-set "_logstamp=%_logstamp::=%"
-set "_logstamp=%_logstamp: =0%"
-set "_logstamp=%_logstamp:.=%"
-set "_logstamp=%_logstamp:,=%"
-set "_logstamp=%_logstamp:/=%"
-set "_logstamp=%_logstamp:\=%"
-set "log_file=%log_dir%\IAS-%_logstamp%.log"
+call :init_log
 set _log_enabled=1
+)
+if %_log_enabled%==1 (
 call :log "IAS %iasver% Æô¶¯£¬²ÎÊý: %_args%"
 call :log "ÈÕÖ¾Êä³ö: %log_file%"
 if %_silent%==0 echo ÈÕÖ¾ÎÄ¼þ: %log_file%
@@ -782,6 +778,15 @@ call :_color %Gray% "IDM ×Ô¶¯¸üÐÂµ½ÐÂ°æ±¾¿ÉÄÜÈÃ¼¤»îÊ§Ð§£»ÈôËüÆµ·±µ¯¸üÐÂÌáÊ¾£¬¿ÉÔ
 
 echo %line%
 echo:
+
+::  ÊÕÎ²Ê±°Ñ±¸·ÝÓëÈÕÖ¾Î»ÖÃÏÔÊ½´òÓ¡³öÀ´£º³ö´íÊ±ÓÃ»§ÄÜÖ±½ÓÄÃµ½»¹Ô­Èë¿ÚºÍ
+::  ¿É·´À¡µÄÈÕÖ¾£¬²»ÓÃÈ¥·­ÎÄµµ²ÂÂ·¾¶¡£
+
+if defined _time call :_color %Gray% "×¢²á±í±¸·Ý: %SystemRoot%\Temp\_Backup_*_%_time%.reg £¨»¹Ô­£ºË«»÷¸ÃÎÄ¼þµ¼Èë¼´¿É£©"
+if "%_log_enabled%"=="1" call :_color %Gray% "ÈÕÖ¾ÎÄ¼þ: %log_file%"
+if not "%exit_code%"=="0" if not "%_log_enabled%"=="1" call :_color %Gray% "·´À¡ÎÊÌâÇ°¿É¼Ó /log ²ÎÊýÖØÅÜÒ»´Î£¬»áÉú³ÉÈÕÖ¾ÎÄ¼þ¡£"
+
+echo:
 echo:
 call :log "Á÷³Ì½áÊø£¬ÍË³öÂë %exit_code%"
 if %_unattended%==1 (
@@ -800,6 +805,7 @@ goto MainMenu
 
 :done2
 
+if "%_log_enabled%"=="1" if %_silent%==0 echo ÈÕÖ¾ÎÄ¼þ: %log_file%
 call :log "Á÷³Ì½áÊø£¬ÍË³öÂë %exit_code%"
 if %_unattended%==1 (
 if %_silent%==1 exit /b %exit_code%
@@ -1103,6 +1109,55 @@ foreach ($regPath in $regPaths) {
 if "%~1"=="" exit /b
 if "%exit_code%"=="0" set "exit_code=%~1"
 if not "%~2"=="" call :log %~2
+exit /b
+
+:parse_logarg
+
+::  Ê¶±ð /log=Â·¾¶ ÐÎÊ½£¨/log ²»´øÂ·¾¶ÓÉÉÏÃæµÄµÈÖµ±È½Ï´¦Àí£©¡£
+::  ×¢Òâ£º²ÎÊý½âÎöÇ°ÒÑ¾­ÓÃ %_args:"=% È¥µôÁËËùÓÐÒýºÅ£¬Òò´ËÂ·¾¶ÖÐ²»ÄÜº¬¿Õ¸ñ¡£
+
+set "_pa=%~1"
+if not defined _pa exit /b
+if /i not "%_pa:~0,5%"=="/log=" exit /b
+if "%_pa:~5%"=="" exit /b
+set _log=1
+set "_logpath=%_pa:~5%"
+exit /b
+
+:init_log
+
+::  ±ØÐë·ÅÔÚ×Ó³ÌÐòÀïÖðÐÐÖ´ÐÐ£ºÈôÐ´ÔÚ if(...) ´úÂë¿éÄÚ£¬%_logstamp% »áÔÚ
+::  Õû¿é½âÎöÊ±Ò»´ÎÐÔÕ¹¿ª£¬È¡²»µ½ÉÏÒ»ÐÐ¸ÕÐ´ÈëµÄÖµ£¬ÈÕÖ¾ÎÄ¼þÃû»áÍË»¯³É
+::  ×ÖÃæÁ¿ IAS-%_logstamp%.log£¬ËùÓÐ¾²Ä¬ÔËÐÐ¶¼×·¼Óµ½Í¬Ò»¸öÎÄ¼þ¡£
+
+if not defined _logpath goto :init_log_default
+call :init_logpath
+if defined log_file exit /b
+echo [¾¯¸æ] ÈÕÖ¾Â·¾¶ %_logpath% ²»¿ÉÐ´£¬¸ÄÓÃÄ¬ÈÏÎ»ÖÃ¡£
+
+:init_log_default
+
+if not exist "%log_dir%" md "%log_dir%" 2>nul
+set "_logstamp=%date%_%time%"
+set "_logstamp=%_logstamp::=%"
+set "_logstamp=%_logstamp: =0%"
+set "_logstamp=%_logstamp:.=%"
+set "_logstamp=%_logstamp:,=%"
+set "_logstamp=%_logstamp:/=%"
+set "_logstamp=%_logstamp:\=%"
+set "log_file=%log_dir%\IAS-%_logstamp%.log"
+exit /b
+
+:init_logpath
+
+::  ÏÈ½¨¸¸Ä¿Â¼ÔÙÊÔÐ´Ò»´Î£»Ð´²»½øÈ¥¾Í·µ»Ø¿Õ log_file£¬ÓÉµ÷ÓÃ·½»ØÍËÄ¬ÈÏÂ·¾¶¡£
+
+for %%i in ("%_logpath%") do set "_lpdir=%%~dpi"
+if not exist "%_lpdir%" md "%_lpdir%" 2>nul
+if not exist "%_lpdir%" exit /b
+(echo:)>>"%_logpath%" 2>nul
+if not exist "%_logpath%" exit /b
+set "log_file=%_logpath%"
 exit /b
 
 :log

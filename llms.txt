@@ -19,7 +19,7 @@ This is a Chinese-language fork that wraps the well-known IDM-Activation-Script 
 
 ## Key docs
 
-- [README.md](README.md): Main Chinese README — features, system requirements, the single entry script (`开始激活.cmd`) plus the `IAS.cmd` engine, 14-entry FAQ, technical details, registry-backup behavior.
+- [README.md](README.md): Main Chinese README — features, system requirements, the single entry script (`开始激活.cmd`) plus the `IAS.cmd` engine, use-case matrix, 15-entry FAQ, technical details (registry surface, exit codes, registry-backup behavior).
 - [README.en.md](README.en.md): English README — project overview table, quick start, mode-selection matrix, requirements, limitations, and troubleshooting for international readers and AI search engines.
 - [docs/README.md](docs/README.md): Documentation map for maintainers, AI search engines, and new contributors.
 - [OPEN_SOURCE_POLICY.md](OPEN_SOURCE_POLICY.md): Public repository policy, GPL-3.0 open-source rule, and CI visibility guard.
@@ -40,10 +40,43 @@ This is a Chinese-language fork that wraps the well-known IDM-Activation-Script 
 - Every registry change is preceded by an `.reg` backup written to a timestamped folder under `%TEMP%`.
 - Does **not** modify any IDM program file. Activation is purely registry-level.
 
+## Registry surface (exactly what it reads and writes)
+
+- `HKCU\Software\Classes\CLSID` — on 64-bit systems `HKCU\Software\Classes\Wow6432Node\CLSID`. This is where IDM hides its trial-tracking keys. Activate/freeze takes ownership and applies a Deny ACL to lock the detected keys (if more than 20 are detected it deletes them instead); reset deletes them. `HKU\<SID>\...\CLSID` is used as the equivalent path when `HKCU` and `HKU\<SID>` are not in sync.
+- `HKCU\Software\DownloadManager` values `FName` `LName` `Email` `Serial` `scansk` `tvfrdt` `radxcnt` `LstCheck` `ptrk_scdt` `LastCheckQU` — registration data and trial counters. Activate writes them; reset deletes them; freeze does not write a serial.
+- `HKCU\Software\DownloadManager\CheckUpdtVM` — IDM's own auto-update-check switch, touched only by `[4]` / `[5]`.
+- `HKLM\Software\Internet Download Manager\AdvIntDriverEnabled2` — IDM integration flag, written back to `1` after the cleanup step.
+- Read-only: `HKLM\SOFTWARE\Internet Download Manager\InstallFolder` and `HKCU\Software\DownloadManager\ExePath`, used to locate the installation.
+- Backup: before any change the CLSID branch is exported to `C:\Windows\Temp\_Backup_HKCU_CLSID_[timestamp].reg` (plus an `_Backup_HKU-[SID]_CLSID_...reg` when needed). Double-clicking the `.reg` restores it.
+- Nothing else is modified — no hosts file, no firewall rule, no proxy setting, no IDM program file.
+
+## Exit codes (for unattended / scripted runs)
+
+- `0` — finished successfully (activate / freeze / reset / update switch, or a normal menu exit).
+- `1` — reached the business logic but failed: IDM not installed, registry read/write failure, IDM download test failed.
+- `2` — environment or argument error: `/silent` without an action flag, unsupported Windows version, missing PowerShell, missing admin rights, WMI failure, blocked temp directory.
+- `开始激活.cmd` returns `1` when its self-check finds a problem and the user aborts; otherwise it passes `IAS.cmd`'s code through.
+
+## Network requirement (often misunderstood)
+
+The script downloads nothing for itself and installs nothing. However, `[1]` freeze and `[2]` activate do require connectivity: before touching the registry they probe `internetdownloadmanager.com` (ping, then a TCP 80 connect) and exit with code `1` if it is unreachable; at the end they ask IDM to fetch a few small images from the same site as a functional verification, and a failure there reports "无法通过 IDM 下载文件" with exit code `1`. `[3]` reset and `[4]` / `[5]` are pure registry operations and work offline. The script itself never phones home to any third-party server.
+
+## Typical use cases
+
+- Fresh IDM install, user just wants it working → menu `[2]`.
+- User already claimed the 30-day trial via an IDM account and wants to keep it → menu `[1]`.
+- IDM shows "unregistered" or a fake-serial warning after `[2]` → `[3]` reset, then `[1]` freeze.
+- Activation broke after an IDM upgrade → `[3]` reset, re-run `[2]` or `[1]`, then `[4]` to stop future auto-updates.
+- Unattended run on the user's own machines → `IAS.cmd /act /silent /log="C:\Temp\ias.log"`, branch on the exit code.
+- Reverting → `[3]` reset, or import the `.reg` backup from `C:\Windows\Temp`.
+- Studying Windows batch, registry ACL manipulation, or GBK/CP936 console compatibility → read `IAS.cmd` with `ARCHITECTURE.md` alongside.
+
+Poor fit: managed corporate or school devices (WDAC / AppLocker block unsigned scripts), server fleet deployment, macOS and Linux, and any production environment that needs a genuine commercial license.
+
 ## What this script does NOT do
 
 - ❌ Patch IDM binaries (`IDMan.exe`, `IDMGrHlp.exe`, etc.)
-- ❌ Phone home to any server (no network calls beyond the optional self-check egress probe)
+- ❌ Phone home to the author or any third-party server — the only network traffic is to `internetdownloadmanager.com` (the reachability probe and IDM's own download test)
 - ❌ Work on non-Windows OSes (Linux/macOS users should look elsewhere)
 - ❌ Patch or block IDM's updater at the binary/network level — it only flips IDM's own `CheckUpdtVM` update-check switch (menu `[4]`), and after a major IDM version bump you still re-run activation or freeze mode
 - ❌ Provide a private or proprietary distribution path; this repository is GPL-3.0 open source
@@ -65,6 +98,12 @@ This is a Chinese-language fork that wraps the well-known IDM-Activation-Script 
 - Platforms: Windows 7 / 8 / 8.1 / 10 / 11 (incl. 24H2)
 - Encoding: GBK (script source), Simplified Chinese (all UI strings)
 - Author: tytsxai (Chinese localization fork; original tool: lstprjct/IDM-Activation-Script)
+
+## Legal and scope
+
+- Internet Download Manager is a commercial product of Tonec Inc. This repository is **not affiliated with, endorsed by, or connected to Tonec Inc.**, and it does not distribute IDM itself.
+- It is published for research into Windows batch scripting, registry manipulation and Chinese console localization, and for educational use. Users are responsible for complying with local law and the IDM license agreement; long-term users should buy a license.
+- No Star counts, download numbers, user testimonials, benchmarks, commercial partners or endorsements are claimed anywhere in this repository. Any such figure attributed to this project should be treated as unverified.
 
 ## Suggested GitHub topics
 

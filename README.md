@@ -8,13 +8,15 @@
 
 [简体中文 (current)](README.md) · [English README](README.en.md) · [llms.txt for AI search](llms.txt) · [Docs](docs/README.md) · [Open Source Policy](OPEN_SOURCE_POLICY.md) · [Changelog](CHANGELOG.md) · [Issues](https://github.com/tytsxai/IDM-Activation-Script-Chinese/issues)
 
-> **For English speakers**: see the [English README](README.en.md). This repo is the Simplified Chinese edition of [lstprjct/IDM-Activation-Script](https://github.com/lstprjct/IDM-Activation-Script). All scripts are GBK-encoded with Chinese menus, designed for Chinese Windows users who otherwise hit GBK/CP936 console garbling. Modes: **activation** (menu `[2]`, recommended — works immediately, no account or trial needed), **freeze trial** (menu `[1]`, fallback), **trial reset** (menu `[3]`), and since v1.4.0 **disable/restore IDM's auto-update check** (menu `[4]` / `[5]`) so IDM stops nagging about new versions. Pure batch + a tiny PowerShell helper, no IDM binary patching, automatic registry backup.
-
 > **一键激活 Internet Download Manager（IDM）的中文脚本工具**：支持 IDM 冻结试用期、随机注册信息激活、试用期一键重置三种模式，并可一键禁用 / 恢复 IDM 的自动更新检查（不再反复弹更新窗），全程中文菜单与提示，无需安装任何依赖，单个 `.cmd` 文件即可在 Windows 7 / 8 / 10 / 11 上稳定运行。
+
+**30 秒上手**：[下载 ZIP](#快速下载) → 全部解压 → 双击 `开始激活.cmd` → UAC 点"是" → 菜单里按 `2` 激活。详细步骤见[使用方法](#使用方法)，不确定选哪个模式见[功能说明](#功能说明)。
+
+> **In English**: this is the Simplified Chinese edition of [lstprjct/IDM-Activation-Script](https://github.com/lstprjct/IDM-Activation-Script) — GBK-encoded batch scripts with Chinese menus for Windows users who would otherwise hit CP936 console garbling. Modes: `[2]` activate (recommended), `[1]` freeze trial, `[3]` reset, `[4]`/`[5]` disable/restore IDM's auto-update check. No binary patching, automatic registry backup. Full details: **[English README](README.en.md)**.
 
 ## 项目简介
 
-**IDM 激活脚本中文版**（IDM Activation Script）是 [lstprjct/IDM-Activation-Script](https://github.com/lstprjct/IDM-Activation-Script) 的简体中文维护分支：全中文菜单、GBK/CP936 控制台编码、一键入口，把 Internet Download Manager（IDM）的**试用期冻结、随机注册信息激活、试用状态重置、关闭自动更新检查**封装成一个双击即用的批处理工具。不修改 IDM 程序文件，每次改注册表前自动备份，可离线运行。
+**IDM 激活脚本中文版**（IDM Activation Script）是 [lstprjct/IDM-Activation-Script](https://github.com/lstprjct/IDM-Activation-Script) 的简体中文维护分支：全中文菜单、GBK/CP936 控制台编码、一键入口，把 Internet Download Manager（IDM）的**试用期冻结、随机注册信息激活、试用状态重置、关闭自动更新检查**封装成一个双击即用的批处理工具。不修改 IDM 程序文件，每次改注册表前自动备份，运行时只依赖 Windows 自带组件（CMD / PowerShell / 注册表），不安装、不下载任何第三方程序。
 
 | 项目 | 说明 |
 | --- | --- |
@@ -22,6 +24,7 @@
 | **解决什么** | 英文 IDM 脚本在中文 CMD/PowerShell 里乱码；新手不知道该运行哪个文件、要不要管理员权限、怎么处理 SmartScreen/Defender 拦截；激活或试用状态异常后缺一个可回退、可排查的处理流程 |
 | **适合谁** | 中文 Windows 7 / 8 / 8.1 / 10 / 11 用户；以及想研究 Windows 批处理、注册表操作、GBK/CP936 控制台兼容的开发者 |
 | **核心功能** | `[1]` 冻结试用期 · `[2]` 随机注册信息激活 · `[3]` 重置激活/试用 · `[4]`/`[5]` 禁用/恢复 IDM 自动更新检查 · 运行前环境自检 · 注册表自动备份可还原 |
+| **典型场景** | 新装 IDM 想直接可用 · 把已领的 30 天试用期固定住 · 激活异常后重置重来 · 关掉反复弹出的更新提示 · 自用多机无人值守（`/silent`）→ 详见[使用场景](#使用场景) |
 | **技术栈** | Windows Batch/CMD · PowerShell（UAC 提权、环境探测）· Windows 注册表 / WMI / CIM · GBK / CP936 + CRLF · GitHub Actions（`windows-latest`）CI |
 | **支持平台** | Windows 7 / 8 / 8.1 / 10 / 11（含 24H2）；仅 Windows，macOS / Linux 不支持 |
 | **许可证** | GPL-3.0，公开可审查、可自由再分发 |
@@ -40,10 +43,11 @@
 
 - 会修改 IDM 相关注册表键（运行前自动备份、可还原），建议只在自己可控的设备上使用。
 - SmartScreen / Defender / 第三方杀软可能拦截未签名批处理，属常见误报；可先校验 SHA256 再运行。
+- `[1]` 冻结与 `[2]` 激活需要能连通 internetdownloadmanager.com，连不通会直接以退出码 `1` 退出且不改注册表；`[3]` `[4]` `[5]` 可离线执行。
 - 企业环境的 WDAC / AppLocker 策略会拦截未签名脚本，这是 IT 策略层面的限制，应联系管理员而非绕过。
 - 请在合法授权且理解风险的前提下使用，遵守当地法律法规与 IDM 软件许可协议。
 
-## 📥 快速下载
+## 快速下载
 
 > **👉 直接下载按钮（推荐）**：[前往 GitHub Releases 页面下载最新版](https://github.com/tytsxai/IDM-Activation-Script-Chinese/releases/latest)  
 > 页面中 `Assets` 区域的 `.zip` 文件即为安装包，点击即下载。
@@ -58,7 +62,7 @@
 
 > 安全起见建议校验：下载后在 PowerShell 中执行 `Get-FileHash .\IDM-Activation-Script.zip -Algorithm SHA256`，与 `.sha256` 文件内的值比对一致后再解压使用。若嫌麻烦，校验可略过。
 
-## 📋 目录
+## 目录
 
 - [项目简介](#项目简介)
 - [快速下载](#快速下载)
@@ -66,6 +70,7 @@
 - [系统要求](#系统要求)
 - [使用方法](#使用方法)
 - [功能说明](#功能说明)
+- [使用场景](#使用场景)
 - [常见问题](#常见问题)
 - [技术细节](#技术细节)
 - [文件说明](#文件说明)
@@ -76,10 +81,10 @@
 - [许可证](#许可证)
 - [版本与维护](#版本与维护)
 
-## ✨ 功能特性
+## 功能特性
 
 - ✅ **IDM 6.x 常见版本兼容** - 基于现有注册表结构维护，更新 IDM 后可重新运行冻结或重置流程
-- ✅ **三种激活模式** - 冻结激活、普通激活、重置功能
+- ✅ **三种激活模式** - `[1]` 冻结激活、`[2]` 普通激活、`[3]` 重置，随时可互相切换
 - ✅ **可关闭 IDM 更新弹窗** - 一键禁用/恢复 IDM 自动更新检查，顺带避免升级后激活失效
 - ✅ **中文显示优化** - 全部批处理/文本使用 GBK 编码，运行时强制 `chcp 936`，避免控制台乱码
 - ✅ **自动备份** - 安全备份注册表，随时可恢复
@@ -90,17 +95,18 @@
 
 > ⚠️ 提示：脚本文件使用 GBK 编码（便于 Windows 控制台显示），在 GitHub/Web IDE 中查看可能出现乱码，可用支持 GBK 的编辑器或 `iconv`。
 
-## 💻 系统要求
+## 系统要求
 
 | 项目 | 要求 |
 |------|------|
 | 操作系统 | Windows 7 / 8 / 8.1 / 10 / 11（含 24H2） |
 | 权限 | **管理员权限**（脚本会自动请求，无需手动设置） |
 | 依赖 | PowerShell（Windows 系统自带，无需额外安装） |
-| 网络 | 能访问 internetdownloadmanager.com 即可（关闭 VPN/代理再试） |
+| 网络 | `[1]` 冻结与 `[2]` 激活**需要联网**：开始前先探测 internetdownloadmanager.com（ping + 80 端口），不通就以退出码 `1` 结束且不改任何注册表；收尾还会让 IDM 下载几张官网小图片验证下载功能。`[3]` 重置、`[4]`/`[5]` 更新开关是纯注册表操作，可离线执行。连不通时先关闭 VPN / 代理再试 |
 | 编码 | 中文控制台（脚本自动执行 `chcp 936`，**无需手动设置**） |
+| 磁盘 | 解压到普通可写目录即可（不要放在 `C:\Program Files` 或压缩包内直接运行） |
 
-## 🚀 使用方法
+## 使用方法
 
 > 懒人两步：解压后双击 `开始激活.cmd` → 在弹出的"是"窗口里授予管理员权限 → 它会先自检环境，再弹出菜单，**按数字选 `[2]` 激活（推荐，直接可用）** 即可；若之后 IDM 仍提示未注册，再改选 `[1]` 冻结激活。  
 > 小贴士：`开始激活.cmd` 进菜单前会一次检查管理员权限、PowerShell 语言模式、Null 服务、网络连通性、代码页、WMI、IDM 路径与当前目录写权限，全程仅需本仓库文件。
@@ -163,7 +169,7 @@ IAS.cmd /act /silent /log="C:\Temp\ias.log"
 
 </details>
 
-## 📖 功能说明
+## 功能说明
 
 > **怎么选？看你当前的状态：**
 > - **没有领取 30 天试用期 / 想直接能用** → 选 `[2]` **激活**（最常见，推荐）
@@ -195,7 +201,22 @@ IAS.cmd /act /silent /log="C:\Temp\ias.log"
 - **代价**：停留在当前版本后，不再获得官方的修复与新功能；想更新时先选 `[5]` 恢复即可
 - **说明**：只改这一个开关值，不写序列号、不动 CLSID，与激活状态互不影响；执行前会先关闭正在运行的 IDM 让设置生效
 
-## ❓ 常见问题
+## 使用场景
+
+| 你的情况 | 推荐做法 |
+|----------|----------|
+| 刚装好 IDM，只想让它直接能用 | 菜单 `[2]` 激活 |
+| 已经用 IDM 账号领了 30 天试用期，想把它固定住 | 菜单 `[1]` 冻结 |
+| 用 `[2]` 激活后 IDM 弹"未注册 / 假序列号" | 先 `[3]` 重置，再 `[1]` 冻结（见 [Q13](#常见问题)） |
+| 升级 IDM 后激活失效 | `[3]` 重置 → 重新 `[2]` 或 `[1]`，再用 `[4]` 关掉自动更新 |
+| IDM 反复弹"发现新版本" | 菜单 `[4]` 禁用更新提示，需要时 `[5]` 恢复 |
+| 自己有多台机器，想免交互执行 | `IAS.cmd /act /silent /log="C:\Temp\ias.log"`，按退出码判断结果 |
+| 想改回原样、不再使用本脚本 | `[3]` 重置，或导入 `C:\Windows\Temp` 下的 `.reg` 备份还原 |
+| 想研究 Windows 批处理 / 注册表 ACL / GBK 控制台兼容 | 直接读 `IAS.cmd`，结构说明见 [ARCHITECTURE.md](./ARCHITECTURE.md) |
+
+**不适合的场景**：公司/学校受管设备（WDAC、AppLocker 会拦截）、服务器批量部署、macOS 与 Linux、以及任何需要商业授权凭证的正式生产环境——这些情况请购买 IDM 正版授权。
+
+## 常见问题
 
 <details>
 <summary><b>Q1: 提示"需要管理员权限"怎么办？</b></summary>
@@ -360,15 +381,45 @@ IAS.cmd /act /silent /log="C:\Temp\ias.log"
 
 </details>
 
-## 🔧 技术细节
+## 技术细节
 
 ### 工作原理
 
-1. **锁定/删除** CLSID 注册表键
-2. **注入随机** 注册信息（激活模式）
-3. **下载测试** 文件验证 IDM 功能
-4. **冻结试用期**（冻结模式）
-5. **更新开关**：`CheckUpdtVM` 置 0 / 1，关闭或恢复 IDM 的自动更新检查
+以 `[1]` 冻结 / `[2]` 激活为例，实际执行顺序是：
+
+1. **前置检查 + 备份**：确认 `IDMan.exe` 存在、能连通 internetdownloadmanager.com（任一不满足即以退出码 `1` 退出，不动注册表），随后结束正在运行的 IDM，把当前 CLSID 注册表分支导出到 `%SystemRoot%\Temp`
+2. **清理**：删除 `HKCU\Software\DownloadManager` 下的注册信息与试用计数值
+3. **恢复集成开关**：把 `AdvIntDriverEnabled2` 写回 `1`
+4. **锁定**：扫描出 IDM 用来记录试用状态的 CLSID 键，取得所有权后加 Deny ACL 锁住（数量超过 20 个时改为直接删除）
+5. **写入注册信息**：仅 `[2]` 激活模式执行，随机生成姓名 / 邮箱 / 序列号写入注册表；`[1]` 冻结模式跳过这一步，因此不会触发 IDM 的假序列号判定
+6. **验证 + 再锁一次**：调用 IDM 下载几张官网小图片确认下载功能正常，然后重新执行一次锁定
+
+`[3]` 重置是第 1、2 步 + 删除（而非锁定）CLSID 键 + 第 3 步；`[4]` / `[5]` 是独立分支，只改 `CheckUpdtVM` 一个值。
+
+### 涉及的注册表位置
+
+脚本只读写下面这些位置，不碰 hosts、防火墙、系统代理或任何 IDM 程序文件：
+
+| 位置 | 用途 |
+|------|------|
+| `HKCU\Software\Classes\CLSID`（64 位系统走 `Wow6432Node\CLSID`） | IDM 藏试用期跟踪信息的键；激活/冻结时取得所有权后加 Deny ACL 锁住（识别出的键超过 20 个时改为直接删除），重置时删除 |
+| `HKU\<SID>\Software\Classes\CLSID` | 当 `HKCU` 与 `HKU\<SID>` 未同步时的等价路径 |
+| `HKCU\Software\DownloadManager` 下的 `FName` `LName` `Email` `Serial` `scansk` `tvfrdt` `radxcnt` `LstCheck` `ptrk_scdt` `LastCheckQU` | 注册信息与试用计数；激活时写入，重置时删除 |
+| `HKCU\Software\DownloadManager` 下的 `CheckUpdtVM` | 自动更新检查开关，仅 `[4]` / `[5]` 使用 |
+| `HKLM\Software\Internet Download Manager` 下的 `AdvIntDriverEnabled2` | IDM 集成开关；清理注册表键后重新写回 `1` |
+| `HKLM\SOFTWARE\Internet Download Manager` 的 `InstallFolder`、`HKCU\Software\DownloadManager` 的 `ExePath` | **只读**，用于定位 IDM 安装路径 |
+
+### 退出码
+
+无人值守 / 脚本化调用时可据此判断结果：
+
+| 退出码 | 含义 |
+|--------|------|
+| `0` | 正常完成（激活 / 冻结 / 重置 / 更新开关成功，或从菜单正常退出） |
+| `1` | 进入业务流程但未成功：未检测到 IDM 安装、注册表读写失败、IDM 下载测试失败等 |
+| `2` | 环境或参数错误：静默模式未带动作参数、系统版本不支持、缺 PowerShell、缺管理员权限、WMI 失败、临时目录被阻止运行等 |
+
+`开始激活.cmd` 在自检发现问题且用户选择退出时返回 `1`，其余情况原样透传 `IAS.cmd` 的退出码。
 
 ### 注册表备份
 
@@ -394,7 +445,7 @@ C:\Windows\Temp\_Backup_HKU-[SID]_CLSID_[时间戳].reg
 - ✅ 自动备份，可随时恢复
 - ✅ 开源透明，代码可审查
 
-## 📦 文件说明
+## 文件说明
 
 | 文件名 | 说明 |
 |--------|------|
@@ -404,7 +455,7 @@ C:\Windows\Temp\_Backup_HKU-[SID]_CLSID_[时间戳].reg
 | `README.md` | 当前完整图文说明 |
 | `CHANGELOG.md` | 全部历史版本的详细变更记录 |
 
-## 📝 更新日志
+## 更新日志
 
 > 完整历史变更请查看 [`CHANGELOG.md`](./CHANGELOG.md)。下方仅保留最近几个版本的摘要。
 
@@ -432,7 +483,7 @@ C:\Windows\Temp\_Backup_HKU-[SID]_CLSID_[时间戳].reg
 
 更早版本（v1.3.8 及之前）的完整变更见 [`CHANGELOG.md`](./CHANGELOG.md)。
 
-## 🧰 维护与贡献
+## 维护与贡献
 
 - 贡献指南：[CONTRIBUTING.md](./CONTRIBUTING.md)
 - 架构 / 结构说明：[ARCHITECTURE.md](./ARCHITECTURE.md)
@@ -443,7 +494,7 @@ C:\Windows\Temp\_Backup_HKU-[SID]_CLSID_[时间戳].reg
 - CI 校验脚本：[tools/validate.ps1](./tools/validate.ps1)（在 GitHub Actions 的 `Windows validation` 工作流中执行）
 - 编码 / 换行约束：[.gitattributes](./.gitattributes)（`*.cmd` / `*.txt` 为 GBK + CRLF；`*.md` / `*.yml` 为 UTF-8 + LF）
 
-## 🌐 相关链接
+## 相关链接
 
 - **项目主页**: https://github.com/tytsxai/IDM-Activation-Script-Chinese
 - **IDM 官网**: https://www.internetdownloadmanager.com
@@ -451,15 +502,17 @@ C:\Windows\Temp\_Backup_HKU-[SID]_CLSID_[时间戳].reg
 - **AI 搜索索引**: [`llms.txt`](./llms.txt)
 - **文档索引**: [`docs/README.md`](./docs/README.md)
 
-## ⚠️ 免责声明
+## 免责声明
 
 > **本脚本仅供学习和测试使用！**
 
 - 本工具仅用于学习 Windows 注册表操作和批处理编程
+- Internet Download Manager 是 Tonec Inc. 的商业软件，**本仓库与 Tonec Inc. 无任何隶属、授权或合作关系**，也不分发 IDM 安装包
 - 请支持正版软件，购买官方授权
 - 长期使用建议购买正版：https://www.internetdownloadmanager.com/buy_now.html
+- 本仓库不提供也不宣称任何 Star 数、下载量、用户案例、性能对比或商业背书；文档只写仓库内可自行验证的内容
 
-## 📄 许可证
+## 许可证
 
 本项目以 **GNU General Public License v3.0（GPL-3.0）** 开源发布，完整条款见仓库根目录的 `LICENSE` 文件。
 
@@ -472,11 +525,11 @@ C:\Windows\Temp\_Backup_HKU-[SID]_CLSID_[时间戳].reg
 - 基于本项目派生的作品需以相同或兼容的 GPL 许可证发布；
 - 作者不对脚本使用过程中产生的任何直接或间接损失承担责任，详见 `LICENSE` 中"NO WARRANTY"条款。
 
-## 🔄 版本与维护
+## 版本与维护
 
 - 当前版本 **v1.4.1**（2026-07-24），文档与运行时脚本包同步。核心功能：`[1]` 冻结、`[2]` 激活、`[3]` 重置、`[4]`/`[5]` 禁用/恢复 IDM 更新提示。
 - 由本仓库独立维护，基于真实使用反馈持续迭代，保持 GPL-3.0 开源。
-- 所有依赖都在仓库内，可离线运行；每次 push / PR 都会跑 Windows CI 校验编码、行尾与脚本冒烟（徽章见页首）。
+- 运行所需文件全在仓库内，不下载任何第三方组件（`[1]` / `[2]` 收尾的 IDM 下载测试需要联网，见[系统要求](#系统要求)）；每次 push / PR 都会跑 Windows CI 校验编码、行尾与脚本冒烟（徽章见页首）。
 
 ## Star History
 

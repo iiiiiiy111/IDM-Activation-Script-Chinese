@@ -62,6 +62,16 @@ IAS.cmd /act /silent /log="C:\Temp\ias.log"    :: unattended run with a log file
 
 `/silent` without one of `/frz` `/act` `/res` `/noupd` `/reupd` exits with code `2`.
 
+### Exit codes
+
+| Code | Meaning |
+| --- | --- |
+| `0` | Finished successfully (activate / freeze / reset / update switch, or a normal menu exit) |
+| `1` | Reached the business logic but failed: IDM not installed, registry read/write failure, IDM download test failed |
+| `2` | Environment or argument error: `/silent` without an action flag, unsupported Windows version, missing PowerShell, missing admin rights, WMI failure, running from a blocked temp directory |
+
+`开始激活.cmd` returns `1` when the self-check finds a problem and the user chooses to abort; otherwise it passes `IAS.cmd`'s exit code through unchanged.
+
 ## Activation modes — which one do I pick?
 
 | Mode | Menu | Use it when | Trade-off |
@@ -97,8 +107,24 @@ IAS.cmd /act /silent /log="C:\Temp\ias.log"    :: unattended run with a log file
 | OS | Windows 7 / 8 / 8.1 / 10 / 11 (including 24H2) |
 | Privileges | Administrator (requested automatically via UAC) |
 | Dependencies | PowerShell (built into Windows) |
-| Network | Access to `internetdownloadmanager.com` (disable VPN/proxy if the check fails) |
+| Network | `[1]` freeze and `[2]` activate **require connectivity**: the run probes `internetdownloadmanager.com` (ping + TCP 80) up front and exits with code `1` without touching the registry if it fails, then finishes by having IDM download a few small images from the official site as a functional check. `[3]` reset and `[4]`/`[5]` are registry-only and work offline. Disable VPN/proxy if the probe fails |
 | Encoding | Chinese console; the script runs `chcp 936` for you |
+| Disk | Extract to a normal writable folder — not `C:\Program Files`, and never run it from inside the ZIP |
+
+## What it touches
+
+Registry only — never hosts, firewall, proxy settings, or any IDM program file:
+
+| Location | Purpose |
+| --- | --- |
+| `HKCU\Software\Classes\CLSID` (`Wow6432Node\CLSID` on 64-bit) | Where IDM hides its trial-tracking keys. Activate/freeze takes ownership and applies a Deny ACL to lock them (or deletes them when more than 20 are detected); reset deletes them |
+| `HKU\<SID>\Software\Classes\CLSID` | Equivalent path used when `HKCU` and `HKU\<SID>` are not in sync |
+| `HKCU\Software\DownloadManager` → `FName` `LName` `Email` `Serial` `scansk` `tvfrdt` `radxcnt` `LstCheck` `ptrk_scdt` `LastCheckQU` | Registration data and trial counters — written by activate, removed by reset |
+| `HKCU\Software\DownloadManager` → `CheckUpdtVM` | IDM's own auto-update-check switch, used only by `[4]` / `[5]` |
+| `HKLM\Software\Internet Download Manager` → `AdvIntDriverEnabled2` | IDM integration flag, written back to `1` after the cleanup step |
+| `HKLM\SOFTWARE\Internet Download Manager` → `InstallFolder`, `HKCU\Software\DownloadManager` → `ExePath` | **Read-only**, used to locate the IDM installation |
+
+Before any change, the CLSID branch is exported to `C:\Windows\Temp\_Backup_HKCU_CLSID_[timestamp].reg` (plus an `HKU-[SID]` file when needed); double-click the `.reg` to roll back.
 
 ## Known issues and limitations
 
@@ -124,7 +150,7 @@ IAS.cmd /act /silent /log="C:\Temp\ias.log"    :: unattended run with a log file
 | "IDM not installed" | Confirm `IDMan.exe` exists under `C:\Program Files (x86)\Internet Download Manager\`; a portable/incomplete install may not have written the registry path |
 | IDM keeps prompting to update | Menu `[4]` (`IAS.cmd /noupd`) disables IDM's update check; `[5]` (`/reupd`) restores it. Fully exit IDM (tray icon included) before reopening it |
 
-Full FAQ (15 entries, in Chinese): [README.md#-常见问题](README.md#-常见问题).
+Full FAQ (15 entries, in Chinese): [README.md#常见问题](README.md#常见问题).
 
 ## Files
 

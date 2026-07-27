@@ -16,7 +16,24 @@ goto :checks
 :elevate
 echo [提示] 正在请求管理员权限，请在弹出的窗口中点击"是"...
 where powershell.exe >nul 2>&1 || goto :noPS
-powershell -NoProfile -Command "Start-Process -FilePath '%self%' -Verb RunAs"
+
+::  两点必须一起处理，否则提权后的行为和"直接以管理员运行"不一致：
+::  1) 路径和参数里的单引号要按 PowerShell 规则转义成两个单引号，
+::     否则含 ' 的目录（如 D:\Tom's Tools\）会让 Start-Process 语法出错；
+::  2) 原来没有传 -ArgumentList，命令行参数会被静默丢掉——用户以为在跑
+::     /frz /silent，提权后的窗口却弹出了交互菜单。
+set "psSelf=%self:'=''%"
+set "psArgs=%*"
+if defined psArgs set "psArgs=!psArgs:'=''!"
+
+if defined psArgs (
+    powershell -NoProfile -Command "Start-Process -FilePath '!psSelf!' -ArgumentList '!psArgs!' -Verb RunAs"
+) else (
+    powershell -NoProfile -Command "Start-Process -FilePath '!psSelf!' -Verb RunAs"
+)
+
+::  提权会新开一个进程，本进程拿不到它的退出码。需要按退出码判断结果的
+::  自动化调用，请以管理员身份直接执行 IAS.cmd。
 exit /b
 
 :noPS
