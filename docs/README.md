@@ -31,6 +31,7 @@
 
 ## 发布说明
 
+- [release-notes-v1.4.3.md](release-notes-v1.4.3.md)：v1.4.3 主菜单改为显示"已适配 IDM 版本 + 本机 IDM 版本"（issue #22），新增浏览器扩展灰色报错的排查 FAQ（issue #23），CI 补上主菜单渲染冒烟。激活逻辑零改动。
 - [release-notes-v1.4.2.md](release-notes-v1.4.2.md)：v1.4.2 上线前稳定性补强——修复日志文件名一直无效、`/log=路径` 文档写了但没实现、`开始激活.cmd` 提权时丢参数；新增发布包一致性守卫与打包脚本。激活逻辑零改动。
 - [release-notes-v1.4.1.md](release-notes-v1.4.1.md)：v1.4.1 发布包改用固定文件名 `IDM-Activation-Script.zip`，`release/` 只保留最新一份，脚本逻辑零改动。
 - [release-notes-v1.4.0.md](release-notes-v1.4.0.md)：v1.4.0 新增"禁用 / 恢复 IDM 更新提示"（菜单 `[4]`/`[5]`、参数 `/noupd` `/reupd`），对应 issue #20。

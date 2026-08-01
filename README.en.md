@@ -149,8 +149,10 @@ Before any change, the CLSID branch is exported to `C:\Windows\Temp\_Backup_HKCU
 | Some web pages stop loading after activation | This is IDM's browser integration module, not the script (it never touches hosts, firewall, or proxy). Disable the IDM browser extension or add the domain to IDM's "do not capture" list |
 | "IDM not installed" | Confirm `IDMan.exe` exists under `C:\Program Files (x86)\Internet Download Manager\`; a portable/incomplete install may not have written the registry path |
 | IDM keeps prompting to update | Menu `[4]` (`IAS.cmd /noupd`) disables IDM's update check; `[5]` (`/reupd`) restores it. Fully exit IDM (tray icon included) before reopening it |
+| IDM extension in Edge/Chrome is greyed out with a red cross | IDM's own browser integration, not the script (it only sets `AdvIntDriverEnabled2=1`). Start IDM first (the script kills `IDMan.exe` on exit), make sure the store extension matches your installed IDM version, re-tick the browser under IDM → Options → General, and confirm IDM is not in "fake serial" state. Details: FAQ Q16 in the Chinese README |
+| Not sure which IDM version the script targets | Since v1.4.3 the main menu prints `脚本 <script version> \| 已适配 IDM <version>` plus the IDM version detected on your machine, instead of claiming "supports the latest IDM" |
 
-Full FAQ (15 entries, in Chinese): [README.md#常见问题](README.md#常见问题).
+Full FAQ (16 entries, in Chinese): [README.md#常见问题](README.md#常见问题).
 
 ## Files
 

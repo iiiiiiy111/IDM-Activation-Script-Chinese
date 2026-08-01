@@ -6,7 +6,7 @@
 
 - `.github/workflows/ci.yml`
   - GitHub Actions 工作流入口（Windows runner）。
-  - 三步：1) 调用 `tools/validate.ps1` 做仓库卫生校验（编码、换行、基础 `cmd.exe` 可用性探测）；2) 用 `IAS.cmd /silent` 做最短路径冒烟，断言退出码为 `2`（"静默模式缺少动作参数"路径）；3) 用 `IAS.cmd /noupd /silent` 做深一层冒烟（runner 上没有 IDM），断言退出码为 `1`（走完提权/PowerShell/WMI/SID/CLSID 探测后命中"未检测到 IDM 安装"）。
+  - 顺序执行仓库卫生校验（`tools/validate.ps1`：编码、换行、基础 `cmd.exe` 探测）、若干条脚本冒烟（`/silent` 最短路径、`/noupd` `/act` `/frz` 未装 IDM 路径、日志路径、交互主菜单渲染）与发布包一致性校验（`tools/verify-release.ps1`），最后重新打包并上传 artifact。逐条断言见下方「CI 数据流」。
 - `.github/ISSUE_TEMPLATE/`
   - `bug_report.yml`：结构化 Bug 反馈模板，强制带 Windows / IDM / 脚本版本与 `开始激活.cmd` 的环境检测输出。
   - `help.yml`：使用帮助 / 新手求助模板。
@@ -17,6 +17,7 @@
 - `IAS.cmd`
   - 主批处理脚本（约 1100 行），包含参数解析、环境探测、激活/冻结/重置流程、IDM 更新检查开关（`CheckUpdtVM`）、注册表备份与日志输出。
   - 头部含「代码导航」注释块，按行号区间标注主要代码段位置。
+  - 头部两个版本变量：`iasver`（脚本自身版本，与 tag / CHANGELOG 顶部由 CI 守一致）、`idmsupport`（脚本最后实际验证过的 IDM 版本，主菜单据此显示"已适配 IDM x.xx"，v1.4.3 起）。适配了新版 IDM 就更新 `idmsupport`，不要再回到"支持最新版"这类模糊文案。
   - 维护注意：该文件依赖 CRLF 行尾与 GBK 编码；部分环境/编辑器的自动转换会导致异常。脚本启动时会自检 LF/CRLF。
 - `开始激活.cmd`（v1.3.6 起的唯一入口，合并了原四个脚本）
   - 自动用 PowerShell 提权（单引号包裹路径，兼容含 `(x86)` 等特殊字符的目录）。
@@ -63,6 +64,7 @@
    - `IAS.cmd /noupd /silent` 冒烟：走完架构重入、PowerShell/WMI 探测、SID 与 CLSID 校验后进入更新开关分支，runner 上没有安装 IDM，因此断言退出码为 `1`。相比上一条能覆盖脚本的绝大部分启动路径。
    - `IAS.cmd /act /silent` 与 `/frz /silent` 冒烟：同样断言 `1`。这两条分支在确认 `IDMan.exe` 存在之前不写注册表、不联网，所以在 runner 上跑是安全的。
    - 日志冒烟：`/log=C:\ias-ci-custom.log` 断言自定义路径确实产出文件（文档承诺过 `/log=路径`，实现漏掉过一次）；不带路径再跑一次，并断言默认日志文件名里带上了真实时间戳，而不是字面量 `IAS-%_logstamp%.log`。
+   - 主菜单渲染冒烟（v1.4.3 起）：`echo 0| call IAS.cmd -qedit` 跑一次交互菜单（`-qedit` 跳过 QuickEdit 的 conhost 重入，管道喂 `0` 选"退出"），输出重定向到 `menu-smoke.txt`；随后用 pwsh 按 GBK 解码断言版本提示行（`脚本 <iasver> | 已适配 IDM <idmsupport>`）确实打印、runner 上走"未检测到 IDM"分支，且输出里没有批处理语法错误。菜单是绝大多数用户唯一会看到的界面，此前只有 `/silent` 无人值守路径被覆盖。
    - `tools/verify-release.ps1`：校验 `release/` 发布包与仓库是否一致（详见下节）。
 3. 任一步失败即阻止合并（建议在 GitHub 仓库设置中将 `Windows validation` 设为分支保护必过项）。
 
