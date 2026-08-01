@@ -162,6 +162,50 @@ jobs:
           }
           Write-Host "Main menu smoke OK: $banner"
 
+      # 上一条只覆盖"未检测到 IDM"的分支。这里用 notepad.exe 冒充 IDMan.exe 并写
+      # HKCU 的 ExePath，把版本探测那条 PowerShell 也跑一遍，断言真的读出了文件
+      # 版本号、并打出"与已适配版本不同"的提示。放在所有激活相关冒烟之后，跑完
+      # 立刻清理，避免影响其它步骤。
+      - name: Smoke probe — menu detects an installed IDM (faked IDMan.exe)
+        shell: cmd
+        run: |
+          chcp 936 >nul
+          md "%ProgramFiles(x86)%\Internet Download Manager" 2>nul
+          copy /y "%SystemRoot%\System32\notepad.exe" "%ProgramFiles(x86)%\Internet Download Manager\IDMan.exe" >nul
+          reg add "HKCU\Software\DownloadManager" /v ExePath /t REG_SZ /d "%ProgramFiles(x86)%\Internet Download Manager\IDMan.exe" /f >nul
+          echo 0| call IAS.cmd -qedit > menu-smoke-idm.txt 2>&1
+          type menu-smoke-idm.txt
+          reg delete "HKCU\Software\DownloadManager" /v ExePath /f >nul 2>&1
+          del /f /q "%ProgramFiles(x86)%\Internet Download Manager\IDMan.exe" >nul 2>&1
+          rd "%ProgramFiles(x86)%\Internet Download Manager" >nul 2>&1
+          exit /b 0
+
+      - name: Assert main menu reported the detected IDM version
+        shell: pwsh
+        run: |
+          [System.Text.Encoding]::RegisterProvider([System.Text.CodePagesEncodingProvider]::Instance)
+          $path = Join-Path $PWD 'menu-smoke-idm.txt'
+          if (-not (Test-Path -LiteralPath $path)) {
+            Write-Host "::error::menu-smoke-idm.txt was not produced."
+            exit 1
+          }
+          $text = [System.IO.File]::ReadAllText($path, [System.Text.Encoding]::GetEncoding(936))
+          $line = ($text -split "`r?`n" | Where-Object { $_ -like '*本机检测到的 IDM*' } | Select-Object -First 1)
+          if (-not $line) {
+            Write-Host "::error::Main menu did not print the detected IDM version line even though IDMan.exe exists."
+            exit 1
+          }
+          if ($line -notmatch '\d+\.\d+') {
+            Write-Host "::error::Detected IDM version line carries no version number: $line"
+            exit 1
+          }
+          # 假的 IDMan.exe 版本必然与 idmsupport 不同，应当打出提示行
+          if ($text -notlike '*与已适配版本不同*') {
+            Write-Host "::error::Main menu did not warn about the version mismatch."
+            exit 1
+          }
+          Write-Host "Detected-version smoke OK: $($line.Trim())"
+
       # 发布包校验放在所有脚本冒烟之后：一个过期的发布包不应该掩盖脚本本身的
       # 冒烟结果。前面全绿、只有这一步红，就等于「代码是好的，但包没重新打」。
       - name: Verify release bundle matches the repository
