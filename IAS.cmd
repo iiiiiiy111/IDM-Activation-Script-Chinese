@@ -1,4 +1,6 @@
-@set iasver=1.4.2
+@set iasver=1.4.3
+::  本脚本最后实际验证过的 IDM 版本（主菜单据此显示"已适配版本"，发版时同步更新）
+@set idmsupport=6.43
 @setlocal DisableDelayedExpansion
 @echo off
 
@@ -15,16 +17,16 @@ chcp 936 >nul 2>&1
 ::   许可证  : GPL-3.0（详见仓库根目录 LICENSE）
 ::
 ::   ----- 代码导航（便于后续维护） -----
-::   001-045 行 : 头部元信息、代码页设置、默认开关
-::   045-115 行 : PATH 设置、Sysnative / SysArm32 架构重入、参数解析（/act /frz /res /noupd /reupd /silent /log[=路径]）
-::   115-150 行 : 日志初始化、静默模式校验、Null 服务检测
-::   150-440 行 : 环境探测（管理员权限、IDM 安装路径、CLSID 注册表项、网络连通性）
-::   445-485 行 : 主菜单（冻结 / 激活 / 重置 / 更新开关 / 下载 / 帮助），交互分派
-::   487-585 行 : 重置流程与注册表删除队列
-::   590-670 行 : 禁用 / 恢复 IDM 自动更新检查（CheckUpdtVM）
-::   671-920 行 : 激活与冻结核心流程、注册表备份、随机注册信息注入、收尾输出
-::   929-1111 行: CLSID 扫描（PowerShell 内嵌段）
-::   1113-1196 行: 退出码记账、日志子程序（:extract_logpath / :init_log / :log）、着色输出
+::   001-047 行 : 头部元信息、代码页设置、默认开关（iasver 脚本版本 / idmsupport 已适配 IDM 版本）
+::   047-117 行 : PATH 设置、Sysnative / SysArm32 架构重入、参数解析（/act /frz /res /noupd /reupd /silent /log[=路径]）
+::   117-152 行 : 日志初始化、静默模式校验、Null 服务检测
+::   152-445 行 : 环境探测（管理员权限、IDM 安装路径、CLSID 注册表项、网络连通性）
+::   447-510 行 : IDM 版本探测 + 主菜单（冻结 / 激活 / 重置 / 更新开关 / 下载 / 帮助），交互分派
+::   512-610 行 : 重置流程与注册表删除队列
+::   615-694 行 : 禁用 / 恢复 IDM 自动更新检查（CheckUpdtVM）
+::   696-945 行 : 激活与冻结核心流程、注册表备份、随机注册信息注入、收尾输出
+::   948-1126 行: CLSID 扫描（PowerShell 内嵌段）
+::   1128-1215 行: 退出码记账、日志子程序（:extract_logpath / :init_log / :log）、着色输出
 ::
 ::============================================================================
 
@@ -448,6 +450,17 @@ if %_reupd%==1 goto :_restoreupd
 if %_activate%==1 (set frz=0&goto :_activate)
 if %_freeze%==1 (set frz=1&goto :_activate)
 
+::  探测本机已安装的 IDM 版本号，只读取 IDMan.exe 的文件版本信息，不写任何注册表。
+::  主菜单据此显示"已适配版本 / 本机版本"，避免"支持最新版"这种模糊说法（issue #22）。
+
+set "idmfound="
+set "idmmm="
+if exist "!IDMan!" (
+for /f "delims=" %%a in ('%psc% "$v=(Get-Item -LiteralPath '!IDMan!').VersionInfo; if ($v.ProductVersion) {$v.ProductVersion.Trim()} else {$v.FileVersion}" %nul6%') do set "idmfound=%%a"
+)
+if defined idmfound for /f "tokens=1,2 delims=., " %%a in ("!idmfound!") do set "idmmm=%%a.%%b"
+call :log "IDM 版本检测: [!idmfound!] 脚本已适配 %idmsupport%"
+
 :MainMenu
 
 cls
@@ -457,7 +470,13 @@ if not defined terminal mode 75, 31
 
 echo:
 echo:
-echo:                此脚本可支持最新版本的 IDM。
+echo:                脚本 %iasver% ^| 已适配 IDM %idmsupport% 及之前的 6.x 版本
+if defined idmmm (
+echo:                本机检测到的 IDM：!idmfound!
+if not "!idmmm!"=="%idmsupport%" echo:                注意：与已适配版本不同，异常时见 README 的 Q10
+) else (
+echo:                本机未检测到 IDM，请先安装 IDM 再激活
+)
 echo:            ___________________________________________________
 echo:
 echo:               [1] 激活（冻结）

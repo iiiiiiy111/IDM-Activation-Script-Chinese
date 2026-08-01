@@ -144,6 +144,10 @@ if not defined idmPath (
 if defined idmPath (
     if exist "!idmPath!\IDMan.exe" (
         echo [√] 已检测到 IDM 安装路径: !idmPath!
+        rem  读取 IDMan.exe 的文件版本，方便自查脚本适配到哪一版（issue #22），也方便提 Issue 时贴版本号
+        set "idmVer="
+        for /f "delims=" %%v in ('powershell -NoProfile -Command "$v=(Get-Item -LiteralPath '!idmPath!\IDMan.exe').VersionInfo; if ($v.ProductVersion) {$v.ProductVersion.Trim()} else {$v.FileVersion}" 2^>nul') do set "idmVer=%%v"
+        if defined idmVer (echo [√] 已检测到 IDM 版本: !idmVer!) else (echo [i] 未能读取 IDM 版本号，不影响激活)
     ) else (
         echo [×] 注册表中的 IDM 路径无效: !idmPath!
         set /a issues+=1

@@ -118,6 +118,50 @@ jobs:
           }
           Write-Host "Log file name OK: $($logs[0].Name)"
 
+      # 交互菜单是最常用的路径，却一直没有冒烟覆盖。v1.4.3 把 IDM 版本探测
+      # 加进了菜单前后，批处理语法写错的话所有交互用户第一屏就会报错。
+      # -qedit 跳过 QuickEdit 的 conhost 重入（否则脚本会另开窗口并退出），
+      # 管道喂入 0 让菜单选"退出"。菜单退出返回的是 choice 的 errorlevel，
+      # 不代表失败，所以这一步只负责抓输出，断言交给下一步。
+      - name: Smoke probe — interactive main menu renders
+        shell: cmd
+        run: |
+          chcp 936 >nul
+          echo 0| call IAS.cmd -qedit > menu-smoke.txt 2>&1
+          type menu-smoke.txt
+          exit /b 0
+
+      - name: Assert main menu printed the IDM version banner
+        shell: pwsh
+        run: |
+          [System.Text.Encoding]::RegisterProvider([System.Text.CodePagesEncodingProvider]::Instance)
+          $path = Join-Path $PWD 'menu-smoke.txt'
+          if (-not (Test-Path -LiteralPath $path)) {
+            Write-Host "::error::menu-smoke.txt was not produced; the interactive menu probe did not run."
+            exit 1
+          }
+          $text = [System.IO.File]::ReadAllText($path, [System.Text.Encoding]::GetEncoding(936))
+          $iasver = (Select-String -LiteralPath 'IAS.cmd' -Pattern '^@set iasver=(.+)$' -Encoding ascii | Select-Object -First 1).Matches[0].Groups[1].Value.Trim()
+          $idmsupport = (Select-String -LiteralPath 'IAS.cmd' -Pattern '^@set idmsupport=(.+)$' -Encoding ascii | Select-Object -First 1).Matches[0].Groups[1].Value.Trim()
+          $banner = "脚本 $iasver | 已适配 IDM $idmsupport"
+          if ($text -notlike "*$banner*") {
+            Write-Host "::error::Main menu did not print the version banner '$banner'."
+            exit 1
+          }
+          # runner 上没有装 IDM，应当走"未检测到"分支
+          if ($text -notlike '*本机未检测到 IDM*') {
+            Write-Host "::error::Main menu did not print the 'IDM not detected' line on a runner without IDM."
+            exit 1
+          }
+          # 批处理块语法写错时的典型报错，出现即视为回归
+          foreach ($bad in @('此时不应有', '命令语法不正确', '不是内部或外部命令', '系统找不到指定的批处理标签')) {
+            if ($text -like "*$bad*") {
+              Write-Host "::error::Main menu output contains a batch syntax error: $bad"
+              exit 1
+            }
+          }
+          Write-Host "Main menu smoke OK: $banner"
+
       # 发布包校验放在所有脚本冒烟之后：一个过期的发布包不应该掩盖脚本本身的
       # 冒烟结果。前面全绿、只有这一步红，就等于「代码是好的，但包没重新打」。
       - name: Verify release bundle matches the repository
